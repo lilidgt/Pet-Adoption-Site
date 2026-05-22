@@ -7,9 +7,13 @@ const Header = () => {
   return (
     <header className="header">
       <img src={logoText} alt="Logo" className="header-logo" />
+      
       <nav className="header-nav">
-        {/* Futuros links de navegação podem entrar aqui */}
+        <a href="#" className="nav-link">Pets para adoção</a>
+        <a href="#" className="nav-link">Minha Casinha</a>
+        <a href="#" className="nav-link">Cadastre Pets</a>
       </nav>
+      
       <img src={loginButton} alt="Login" className="login-button" />
     </header>
   );
