@@ -1,0 +1,11 @@
+.sandbox-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: #ffffff; /* Fundo branco limpo */
+}
+
+.sandbox-content {
+  flex-grow: 1;
+  width: 100%;
+}
