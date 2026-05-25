@@ -1,0 +1,93 @@
+.filters-container {
+  background-color: #F8A6B4;
+  width: 300px;
+  min-height: calc(100vh - 160px);
+  padding: 32px;
+  border-radius: 30px;
+  box-sizing: border-box;
+  font-family: 'SN Pro', sans-serif;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  margin-top: 20px; /* Mantém apenas a margem superior para não colar no header */
+}
+
+.filters-title {
+  font-family: 'SN Pro', sans-serif;
+  font-size: 32px;
+  font-weight: 600;
+  margin: 0 0 8px 0;
+  color: #000000;
+  text-align: left;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  text-align: left;
+}
+
+.filter-group label {
+  font-size: 18px;
+  font-weight: 500;
+  color: #000000;
+}
+
+.filter-group input, 
+.filter-group select {
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: none;
+  font-family: 'SN Pro', sans-serif;
+  font-size: 16px;
+  background-color: #ffffff;
+  outline: none;
+}
+
+.filter-group-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.filter-group-row input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+}
+
+.tags-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tag-button {
+  background-color: #ffffff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-family: 'SN Pro', sans-serif;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tag-button.active {
+  background-color: #000000;
+  color: #ffffff;
+}
+
+.tag-button:hover:not(.active) {
+  background-color: #eee;
+}
+
+@media (max-width: 768px) {
+  .filters-container {
+    width: 100%;
+    min-height: auto;
+  }
+}
