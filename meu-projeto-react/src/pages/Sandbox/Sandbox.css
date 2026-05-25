@@ -1,0 +1,12 @@
+/* APENAS PARA TESTE (SANDBOX)*/
+.sandbox-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: #ffffff;
+}
+
+.sandbox-content {
+  flex-grow: 1;
+  width: 100%;
+}
