@@ -1,3 +1,4 @@
+/* APENAS PARA TESTE (SANDBOX)*/
 import React from 'react';
 import Header from '../../components/Header/Header';
 import './Sandbox.css';
@@ -8,7 +9,7 @@ const Sandbox = () => {
       <Header />
       
       <main className="sandbox-content">
-        {/* Espaço limpo para visualização dos componentes */}
+        {}
       </main>
     </div>
   );

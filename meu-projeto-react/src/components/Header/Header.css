@@ -9,36 +9,126 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  transition: all 0.3s ease; /* suaviza transição de tela */
 }
 
 .header-logo {
   width: 112px;
   height: auto;
+  transition: width 0.3s ease;
 }
 
 .login-button {
   width: 92px;
   height: auto;
   cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.login-button:hover {
+  animation: bounce 0.5s ease-in-out infinite;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
 }
 
 .header-nav {
   display: flex;
-  gap: 32px; /* Distância de 32px entre os links */
+  gap: 32px;
   align-items: center;
   justify-content: center;
-  flex: 1; /* Faz a nav ocupar o espaço central */
+  flex: 1;
+  transition: gap 0.3s ease;
 }
 
 .nav-link {
   font-family: 'SN Pro', sans-serif;
   font-size: 24px;
-  font-weight: 500; /* Peso Medium */
+  font-weight: 500;
   text-decoration: none;
-  color: #000000; /* Cor preta para os links */
+  color: #000000;
   white-space: nowrap;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.nav-link::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 2px;
+  bottom: -4px;
+  left: 50%;
+  background-color: #000000;
+  transition: all 0.3s ease;
+  transform: translateX(-50%);
+  border-radius: 2px;
 }
 
 .nav-link:hover {
-  opacity: 0.7; /* Efeito visual ao passar o mouse */
+  transform: translateY(-2px);
+  color: #444;
+}
+
+.nav-link:hover::after {
+  width: 100%;
+}
+
+/* MARK: RESPONSIVIDADE */
+
+/* Tablets e Telas Médias (até 1024px) */
+@media (max-width: 1024px) {
+  .header {
+    height: 100px;
+    padding: 0 24px;
+  }
+  .header-nav {
+    gap: 20px;
+  }
+  .nav-link {
+    font-size: 20px;
+  }
+  .header-logo {
+    width: 100px;
+  }
+  .login-button {
+    width: 80px;
+  }
+}
+
+/* celular (até 768px) */
+@media (max-width: 768px) {
+  .header {
+    height: 80px;
+    padding: 0 16px;
+    border-bottom-left-radius: 20px;
+    border-bottom-right-radius: 20px;
+  }
+  .header-nav {
+    gap: 12px;
+  }
+  .nav-link {
+    font-size: 14px;
+  }
+  .header-logo {
+    width: 80px;
+  }
+  .login-button {
+    width: 60px;
+  }
+  @keyframes bounce {
+    50% { transform: translateY(-5px); } /* pulo menor em telas pequenas */
+  }
+}
+
+/* telas mt pequenas (até 480px) */
+@media (max-width: 480px) {
+  .nav-link {
+    font-size: 12px;
+  }
+  .header-nav {
+    gap: 8px;
+  }
 }
