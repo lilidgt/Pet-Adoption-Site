@@ -14,10 +14,10 @@
 
 :root {
   --text: #6b6375;
-  --text-h: #08060d;
+  --text-h: #532D2D;
   --bg: #fff;
   --border: #e5e4e7;
-  --sans: 'SN Pro', system-ui, sans-serif; /* Agora SN Pro é a padrão */
+  --sans: 'SN Pro', system-ui, sans-serif;
   
   font: 18px/145% var(--sans);
 }
@@ -25,6 +25,7 @@
 body {
   margin: 0;
   font-family: 'SN Pro', sans-serif;
+  color: #532D2D;
 }
 
 #root {
