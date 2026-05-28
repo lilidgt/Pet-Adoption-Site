@@ -70,7 +70,7 @@
 /* posicionamento do icone dentro do botao favoritar */
 .btn-favorite img {
     position: absolute;
-    left: 24px;
+    left: 48px;
 }
 
 /* cor do icone svg no botao favoritar */
