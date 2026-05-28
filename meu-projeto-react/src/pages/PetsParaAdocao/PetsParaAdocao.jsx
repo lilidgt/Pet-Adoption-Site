@@ -5,7 +5,7 @@ import PetCard from "../../components/Cards/PetCard";
 import Footer from '../../components/Footer/Footer';
 import "./PetsParaAdocao.css";
 
-const PetsParaAdocao = () => {
+const PetsParaAdocao = ({ onCardClick }) => {
   return (
     <div className="pets-adocao-container">
       <Header />
@@ -16,12 +16,12 @@ const PetsParaAdocao = () => {
         <div className="pets-adocao-content">
           <div className="pets-grid">
             {/* Simulando a listagem de pets como no Sandbox */}
-            <PetCard />
-            <PetCard />
-            <PetCard />
-            <PetCard />
-            <PetCard />
-            <PetCard />
+            <PetCard onClick={onCardClick} />
+            <PetCard onClick={onCardClick} />
+            <PetCard onClick={onCardClick} />
+            <PetCard onClick={onCardClick} />
+            <PetCard onClick={onCardClick} />
+            <PetCard onClick={onCardClick} />
           </div>
         </div>
       </main>

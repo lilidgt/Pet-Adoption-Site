@@ -8,9 +8,34 @@
 .pet-detail-main {
     flex-grow: 1;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    align-items: center;
     padding: 40px 32px;
     box-sizing: border-box;
+}
+
+.btn-back {
+    align-self: flex-start;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: none;
+    border: none;
+    color: #4A2C2A;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    margin-bottom: 20px;
+    transition: transform 0.2s;
+    font-family: inherit;
+}
+
+.btn-back:hover {
+    transform: translateX(-5px);
+}
+
+.btn-back img {
+    width: 20px;
 }
 
 .pet-detail-container {

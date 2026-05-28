@@ -14,12 +14,18 @@ import footprintIcon from '../../assets/footprint icon.svg';
 import personIcon from '../../assets/person icon.png';
 import contactIcon from '../../assets/contact icon.png';
 
-const PetDetail = () => {
+import leftArrow from '../../assets/left arrow.svg';
+
+const PetDetail = ({ onBackClick }) => {
     return (
         <div className="pet-detail-page">
             <Header />
             
             <main className="pet-detail-main">
+                <button className="btn-back" onClick={onBackClick}>
+                    <img src={leftArrow} alt="Voltar" />
+                    Voltar
+                </button>
                 <div className="pet-detail-container">
                     
                     {/* Coluna Esquerda: Ações, Carrossel e Nome */}
