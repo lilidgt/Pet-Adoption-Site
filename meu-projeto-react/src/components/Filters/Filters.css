@@ -11,6 +11,7 @@
   gap: 24px;
   margin-top: 20px;
   box-shadow: 0 8px 24px rgba(248, 166, 180, 0.3);
+  color: #532D2D;
 }
 
 .filters-title {
@@ -18,7 +19,7 @@
   font-size: 32px;
   font-weight: 600;
   margin: 0 0 10px 0;
-  color: #000000;
+  color: #532D2D;
   text-align: left;
 }
 
@@ -32,7 +33,7 @@
 .filter-group label {
   font-size: 15px;
   font-weight: 600;
-  color: #333;
+  color: #532D2D;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   padding-left: 4px;
@@ -45,7 +46,7 @@
   font-family: 'SN Pro', sans-serif;
   font-size: 15px;
   background-color: #ffffff;
-  color: #000;
+  color: #532D2D;
   outline: none;
   transition: all 0.3s ease;
   width: 100%;
@@ -54,14 +55,14 @@
 }
 
 .filter-input:focus {
-  border-color: #000000;
+  border-color: #532D2D;
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
   transform: translateY(-1px);
 }
 
 .filter-input:disabled {
   background-color: rgba(255, 255, 255, 0.5);
-  color: #888;
+  color: #7A4E4E;
   cursor: not-allowed;
   box-shadow: none;
 }
@@ -74,6 +75,7 @@
   padding: 12px 16px;
   border-radius: 16px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  color: #532D2D;
 }
 
 .filter-group-row label {
@@ -81,16 +83,16 @@
   text-transform: none;
   font-size: 16px;
   letter-spacing: 0;
+  color: #532D2D;
 }
 
 .filter-checkbox {
   width: 20px;
   height: 20px;
   cursor: pointer;
-  accent-color: #000000;
+  accent-color: #532D2D;
 }
 
-/* Estilização do Slider */
 .filter-range {
   -webkit-appearance: none;
   width: 100%;
@@ -106,7 +108,7 @@
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  background: #000000;
+  background: #532D2D;
   cursor: pointer;
   border: 3px solid #F8A6B4;
   box-shadow: 0 2px 8px rgba(0,0,0,0.2);
@@ -122,7 +124,7 @@
   display: flex;
   justify-content: space-between;
   font-size: 13px;
-  color: #333;
+  color: #532D2D;
   font-weight: 600;
 }
 
@@ -143,10 +145,11 @@
   cursor: pointer;
   transition: all 0.2s ease;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+  color: #532D2D;
 }
 
 .tag-button.active {
-  background-color: #000000;
+  background-color: #532D2D;
   color: #ffffff;
   transform: scale(1.05);
 }
@@ -154,6 +157,7 @@
 .tag-button:hover:not(.active) {
   background-color: #f0f0f0;
   transform: translateY(-2px);
+  color: #532D2D;
 }
 
 @media (max-width: 768px) {
