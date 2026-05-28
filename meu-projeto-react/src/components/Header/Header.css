@@ -9,7 +9,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  transition: all 0.3s ease; /* suaviza transição de tela */
+  transition: all 0.3s ease;
 }
 
 .header-logo {
@@ -48,7 +48,7 @@
   font-size: 24px;
   font-weight: 500;
   text-decoration: none;
-  color: #000000;
+  color: #532D2D;
   white-space: nowrap;
   transition: all 0.3s ease;
   position: relative;
@@ -61,7 +61,7 @@
   height: 2px;
   bottom: -4px;
   left: 50%;
-  background-color: #000000;
+  background-color: #532D2D;
   transition: all 0.3s ease;
   transform: translateX(-50%);
   border-radius: 2px;
@@ -69,16 +69,13 @@
 
 .nav-link:hover {
   transform: translateY(-2px);
-  color: #444;
+  color: #7A4E4E;
 }
 
 .nav-link:hover::after {
   width: 100%;
 }
 
-/* MARK: RESPONSIVIDADE */
-
-/* Tablets e Telas Médias (até 1024px) */
 @media (max-width: 1024px) {
   .header {
     height: 100px;
@@ -98,7 +95,6 @@
   }
 }
 
-/* celular (até 768px) */
 @media (max-width: 768px) {
   .header {
     height: 80px;
@@ -119,11 +115,10 @@
     width: 60px;
   }
   @keyframes bounce {
-    50% { transform: translateY(-5px); } /* pulo menor em telas pequenas */
+    50% { transform: translateY(-5px); }
   }
 }
 
-/* telas mt pequenas (até 480px) */
 @media (max-width: 480px) {
   .nav-link {
     font-size: 12px;
