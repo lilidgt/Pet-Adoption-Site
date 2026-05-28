@@ -3,6 +3,7 @@ import Header from "../../components/Header/Header";
 import Filters from "../../components/Filters/Filters";
 import PetCard from "../../components/Cards/PetCard";
 import PetDetailView from "../../components/PetDetailView/PetDetailView";
+import Footer from '../../components/Footer/Footer';
 import "./Sandbox.css";
 
 const Sandbox = () => {
@@ -37,6 +38,7 @@ const Sandbox = () => {
           <h2 style={{ padding: "40px", color: "#888" }}>Main Content Area</h2>
         </div>
       </main>
+      <Footer />
     </div>
   );
 };

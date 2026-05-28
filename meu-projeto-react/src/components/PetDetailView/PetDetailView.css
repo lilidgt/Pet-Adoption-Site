@@ -1,6 +1,6 @@
 /* container principal que envolve toda a visualizacao do pet */
 .pet-main-wrapper {
-    min-height: 100vh;
+    min-height: 700px;
     padding: 32px;
     display: flex;
     justify-content: center;
@@ -10,16 +10,17 @@
 /* container principal que agrupa as colunas esquerda e direita */
 .pet-container {
     background-color: var(--brand-pink);
-    padding: 55px 73px 26px 73px;
+    padding: 40px;
     display: flex;
     gap: 56px;
     width: 100%;
     border-radius: 20px;
+    
 }
 
 /* coluna esquerda contendo acoes, imagem e nome do pet */
 .pet-left-col {
-    flex: 45;
+    flex: 40;
     display: flex;
     flex-direction: column;
 }
@@ -69,7 +70,7 @@
 /* posicionamento do icone dentro do botao favoritar */
 .btn-favorite img {
     position: absolute;
-    left: 24px;
+    left: 48px;
 }
 
 /* cor do icone svg no botao favoritar */
@@ -224,6 +225,7 @@
 /* estilo do card sobre o pet */
 .pet-about-card {
     text-align: left;
+    min-height: 252px;
 }
 
 /* estilo do titulo do card sobre */
@@ -274,6 +276,8 @@
 
 /* estilo especifico do botao de acao de contato */
 .btn-contact-action {
+    background-color: #4A2C2A;
+    color: #ffffff;
     flex: 1;
     justify-content: center;
     border: none;

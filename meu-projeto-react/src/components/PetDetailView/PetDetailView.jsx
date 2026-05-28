@@ -2,6 +2,8 @@
 import React from 'react';
 // importacao do arquivo de estilos css
 import './PetDetailView.css';
+import PetCarousel from "../../components/PetCarousel/PetCarousel";
+import Footer from '../Footer/Footer';
 
 // importacao dos icones utilizados no componente
 import houseIcon from '../../assets/house.fill.svg';
@@ -17,6 +19,7 @@ import contactIcon from '../../assets/contact icon.png';
 const PetDetailView = () => {
     return (
         // container principal da pagina
+        <div>
         <main className="pet-main-wrapper">
             {/* container que agrupa as duas colunas */}
             <div className="pet-container">
@@ -35,18 +38,7 @@ const PetDetailView = () => {
                     </div>
 
                     {/* container da imagem do pet com navegacao */}
-                    <div className="pet-image-wrapper">
-                        {/* seta para navegar para imagem anterior */}
-                        <button className="nav-arrow left-arrow">❮</button>
-                        {/* imagem principal do pet */}
-                        <img
-                            src="https://images.unsplash.com/photo-1543466835-00a7907e9de1?q=80&w=800&auto=format&fit=crop"
-                            alt="Foto do Paçoca no gramado"
-                            className="pet-photo"
-                        />
-                        {/* seta para navegar para proxima imagem */}
-                        <button className="nav-arrow right-arrow">❯</button>
-                    </div>
+                    <PetCarousel />
 
                     {/* nome do pet */}
                     <h1 className="pet-name">Paçoca</h1>
@@ -144,6 +136,8 @@ const PetDetailView = () => {
                 </section>
             </div>
         </main>
+        <Footer />
+    </div>
     );
 };
 
