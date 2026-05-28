@@ -27,3 +27,20 @@
     padding: 0 16px; /* Padding menor em telas pequenas */
   }
 }
+
+/*pros cards*/
+/*pra ir pro lado e não pra baixo */
+.sandbox-content {
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 24px;
+  padding: 20px;
+}
+
+/*pra ficarem em colunas certinho*/
+.pets-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 350px);
+  gap: 25px 110px;
+  width: 100%;
+}
