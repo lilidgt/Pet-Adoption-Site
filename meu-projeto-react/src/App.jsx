@@ -1,11 +1,11 @@
 import React from 'react';
-import PetDetail from './pages/PetDetail/PetDetail';
+import PetsParaAdocao from './pages/PetsParaAdocao/PetsParaAdocao';
 import './App.css';
 
 function App() {
   return (
     <div className="App">
-      <PetDetail /> 
+      <PetsParaAdocao /> 
     </div>
   );
 }
