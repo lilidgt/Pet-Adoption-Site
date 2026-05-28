@@ -1,0 +1,414 @@
+/* container principal que envolve toda a visualizacao do pet */
+.pet-main-wrapper {
+    min-height: 700px;
+    padding: 32px;
+    display: flex;
+    justify-content: center;
+    font-family: inherit;
+}
+
+/* container principal que agrupa as colunas esquerda e direita */
+.pet-container {
+    background-color: var(--brand-pink);
+    padding: 40px;
+    display: flex;
+    gap: 56px;
+    width: 100%;
+    border-radius: 20px;
+    
+}
+
+/* coluna esquerda contendo acoes, imagem e nome do pet */
+.pet-left-col {
+    flex: 40;
+    display: flex;
+    flex-direction: column;
+}
+
+/* container dos botoes de acao favoritar e adotar */
+.pet-actions {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+/* estilo base para os botoes de favoritar e adotar */
+.btn-favorite, .btn-adopt {
+    flex: 1;
+    padding: 12px 24px;
+    border-radius: 30px;
+    border: none;
+    font-size: 1.4rem;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    font-family: inherit;
+    position: relative;
+}
+
+/* efeito de hover nos botoes de acao */
+.btn-favorite:hover, .btn-adopt:hover {
+    transform: scale(1.05);
+}
+
+/* efeito de click nos botoes de acao */
+.btn-favorite:active, .btn-adopt:active {
+    transform: scale(0.95);
+}
+
+/* estilo especifico do botao de favoritar */
+.btn-favorite {
+    background-color: #FCF9F2;
+    color: #4A2C2A;
+    padding-left: 52px;
+}
+
+/* posicionamento do icone dentro do botao favoritar */
+.btn-favorite img {
+    position: absolute;
+    left: 24px;
+}
+
+/* cor do icone svg no botao favoritar */
+.btn-favorite svg {
+    color: #F8A5B6;
+    fill: #F8A5B6;
+}
+
+/* estilo especifico do botao de adotar */
+.btn-adopt {
+    background-color: #4A2C2A;
+    color: #ffffff;
+}
+
+/* container da imagem do pet com setas de navegacao */
+.pet-image-wrapper {
+    position: relative;
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    display: flex;
+}
+
+/* estilo da foto principal do pet */
+.pet-photo {
+    width: 100%;
+    height: 400px;
+    object-fit: cover;
+    display: block;
+}
+
+/* estilo das setas de navegacao entre fotos */
+.nav-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: #000;
+    color: #fff;
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* posicionamento da seta esquerda */
+.left-arrow {
+    left: 16px;
+}
+
+/* posicionamento da seta direita */
+.right-arrow {
+    right: 16px;
+}
+
+/* estilo do nome do pet */
+.pet-name {
+    font-family: 'Gluten', cursive;
+    font-size: 3.0rem;
+    color: #4A2C2A;
+    text-align: center;
+    margin-top: 62px;
+    font-weight: 900;
+    letter-spacing: 2px;
+}
+
+/* coluna direita contendo cards de informacao */
+.pet-right-col {
+    flex: 55;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+/* estilo padrao dos cards brancos */
+.pet-detail-card {
+    background-color: #FCF9F2;
+    border-radius: 24px;
+    padding: 32px;
+    color: #4A2C2A;
+}
+
+/* grade de atributos do pet */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-bottom: 32px;
+}
+
+/* container de cada item de atributo */
+.stat-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* container dos textos dentro de cada atributo */
+.stat-item > div {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+}
+
+/* estilo dos icones de atributos */
+.stat-icon {
+    width: 42px;
+    height: 42px;
+    object-fit: contain;
+    opacity: 0.6;
+}
+
+/* estilo do rotulo de cada atributo */
+.stat-label {
+    font-weight: bold;
+    font-size: 1.1rem;
+    margin: 0;
+    line-height: 1.1;
+    text-align: left;
+}
+
+/* estilo do valor de cada atributo */
+.stat-value {
+    margin: 0;
+    font-size: 0.95rem;
+    opacity: 0.8;
+    line-height: 1.1;
+    text-align: left;
+}
+
+/* container das tags de caracteristicas */
+.tags-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+/* estilo de cada tag individual */
+.tag {
+    background-color: #F8E1BF;
+    color: #9C8271;
+    padding: 2px 4px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: normal;
+}
+
+/* estilo do card sobre o pet */
+.pet-about-card {
+    text-align: left;
+    min-height: 252px;
+}
+
+/* estilo do titulo do card sobre */
+.pet-about-card h2 {
+    margin-top: 0;
+    margin-bottom: 16px;
+    font-size: 1.5rem;
+}
+
+/* estilo do paragrafo de descricao */
+.pet-about-card p {
+    line-height: 1.6;
+    opacity: 0.8;
+}
+
+/* linha de contatos do responsavel */
+.pet-contact-row {
+    display: flex;
+    gap: 16px;
+    height: 52px;
+}
+
+/* estilo base para informacoes de contato e botao de acao */
+.contact-info, .btn-contact-action {
+    background-color: #FCF9F2;
+    border-radius: 20px;
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #4A2C2A;
+}
+
+/* estilo especifico das informacoes de contato */
+.contact-info {
+    flex: 1;
+    justify-content: flex-start;
+    gap: 8px;
+}
+
+/* container dos textos dentro das informacoes de contato */
+.contact-info > div {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+}
+
+/* estilo especifico do botao de acao de contato */
+.btn-contact-action {
+    background-color: #4A2C2A;
+    color: #ffffff;
+    flex: 1;
+    justify-content: center;
+    border: none;
+    font-weight: bold;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    font-family: inherit;
+}
+
+/* estilo dos icones de contato */
+.contact-icon {
+    width: 36px;
+    height: 36px;
+    object-fit: contain;
+    display: block; /* Fixes baseline vertical alignment bug */
+}
+
+/* Push only the Responsavel icon up */
+.contact-info .contact-icon {
+    transform: translateY(-3px);
+}
+
+/* estilo do rotulo de contato */
+.contact-label {
+    font-weight: bold;
+    margin: 0;
+    font-size: 1.1rem;
+    line-height: 1.1;
+}
+
+/* estilo do valor de contato */
+.contact-value {
+    margin: 0;
+    font-size: 0.8rem;
+    opacity: 0.7;
+    line-height: 1.1;
+    text-align: left;
+}
+
+/* efeito de hover no botao de acao de contato */
+.btn-contact-action:hover {
+    transform: translateY(-2px) scale(1.02);
+}
+
+/* efeito de click no botao de acao de contato */
+.btn-contact-action:active {
+    transform: scale(0.95);
+}
+
+/* responsividade para tablets e celulares ate 900px */
+@media (max-width: 900px) {
+    /* altera container para layout vertical */
+    .pet-container {
+        flex-direction: column;
+        padding: 32px 24px;
+        gap: 2rem;
+    }
+
+    /* ajusta coluna esquerda para largura total */
+    .pet-left-col {
+        flex: none;
+        width: 100%;
+    }
+
+    /* ajusta coluna direita para largura total */
+    .pet-right-col {
+        flex: none;
+        max-width: 100%;
+        width: 100%;
+    }
+
+    /* reduz altura da foto do pet */
+    .pet-photo {
+        height: 300px;
+    }
+
+    /* reduz tamanho do nome do pet */
+    .pet-name {
+        font-size: 2.8rem;
+    }
+
+    /* ajusta grade de atributos para 2 colunas */
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    /* altera linha de contatos para layout vertical */
+    .pet-contact-row {
+        flex-direction: column;
+        height: auto;
+    }
+
+    /* ajusta largura e altura dos itens de contato */
+    .contact-info, .btn-contact-action {
+        width: 100%;
+        height: 52px;
+        padding: 0 16px;
+        box-sizing: border-box;
+    }
+
+    /* centraliza informacoes de contato */
+    .contact-info {
+        justify-content: center;
+    }
+}
+
+/* responsividade para celulares ate 480px */
+@media (max-width: 480px) {
+    /* reduz espacamento do container */
+    .pet-container {
+        padding: 24px 16px;
+    }
+
+    /* reduz ainda mais a altura da foto */
+    .pet-photo {
+        height: 250px;
+    }
+
+    /* reduz ainda mais o tamanho do nome */
+    .pet-name {
+        font-size: 2.2rem;
+    }
+
+    /* altera botoes de acao para layout vertical */
+    .pet-actions {
+        flex-direction: column;
+    }
+
+    /* ajusta grade de atributos para 1 coluna */
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+}
