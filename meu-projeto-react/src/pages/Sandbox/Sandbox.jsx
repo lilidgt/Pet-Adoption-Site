@@ -1,7 +1,7 @@
 import React from "react";
 import Header from "../../components/Header/Header";
 import Filters from "../../components/Filters/Filters";
-import Footer from "../../components/Footer/Footer";
+import PetCard from "../../components/Cards/PetCard";
 import "./Sandbox.css";
 
 const Sandbox = () => {
@@ -13,12 +13,17 @@ const Sandbox = () => {
         <Filters />
 
         <div className="sandbox-content">
-          {/* Espaço para futuros componentes como cards de pets */}
+          <div className="pets-grid">
+            <PetCard />
+            <PetCard />
+            <PetCard />
+            <PetCard />
+            <PetCard />
+            <PetCard />
+          </div>
           <h2 style={{ padding: "40px", color: "#888" }}>Main Content Area</h2>
         </div>
       </main>
-
-      <Footer />
     </div>
   );
 };
