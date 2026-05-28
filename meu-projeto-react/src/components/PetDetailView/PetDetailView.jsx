@@ -56,7 +56,7 @@ const PetDetailView = () => {
                 <section className="pet-right-col">
 
                     {/* card 1: atributos e tags */}
-                    <div className="pet-card pet-stats-card">
+                    <div className="pet-detail-card pet-stats-card">
                         {/* grid com informacoes basicas do pet */}
                         <div className="stats-grid">
                             {/* informacao de idade */}
@@ -113,7 +113,7 @@ const PetDetailView = () => {
                     </div>
 
                     {/* card 2: sobre */}
-                    <div className="pet-card pet-about-card">
+                    <div className="pet-detail-card pet-about-card">
                         {/* titulo da secao sobre */}
                         <h2>Sobre o Paçoca</h2>
                         {/* descricao do pet */}
@@ -126,7 +126,7 @@ const PetDetailView = () => {
                     {/* card 3: contatos */}
                     <div className="pet-contact-row">
                         {/* informacoes do responsavel */}
-                        <div className="pet-card contact-info">
+                        <div className="pet-detail-card contact-info">
                             <img src={personIcon} alt="Responsável" className="contact-icon"/>
                             <div>
                                 <p className="contact-label">Responsável</p>
@@ -135,7 +135,7 @@ const PetDetailView = () => {
                         </div>
 
                         {/* botao para entrar em contato */}
-                        <button className="pet-card btn-contact-action">
+                        <button className="pet-detail-card btn-contact-action">
                             <img src={contactIcon} alt="Entrar em contato" className="contact-icon"/>
                             Entrar em contato
                         </button>
