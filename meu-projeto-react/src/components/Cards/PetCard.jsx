@@ -2,7 +2,7 @@ import React from "react";
 import "./PetCard.css";
 import imagemExemplo from "../../assets/imagemExemplo.jpg";
 
-const PetCard = ({ pet = {} }) => {
+const PetCard = ({ pet = {}, onClick }) => {
   //Se estiver vazio, só pro exemplo
   const mockDefault = {
     image: imagemExemplo,
@@ -33,7 +33,11 @@ const PetCard = ({ pet = {} }) => {
   } = finalPet;
 
   return (
-    <article className="pet-card">
+    <article 
+      className="pet-card" 
+      onClick={onClick} 
+      style={{ cursor: onClick ? "pointer" : "default" }}
+    >
       <div className="pet-card-image-container">
         <img
           src={image}
