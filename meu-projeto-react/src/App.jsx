@@ -17,9 +17,9 @@ function App() {
   return (
     <div className="App">
       {currentPage === 'list' ? (
-        <PetsParaAdocao onCardClick={goToDetails} />
+        <PetsParaAdocao onCardClick={goToDetails} onNavigate={goToList} />
       ) : (
-        <PetDetail onBackClick={goToList} />
+        <PetDetail onBackClick={goToList} onNavigate={goToList} />
       )}
     </div>
   );

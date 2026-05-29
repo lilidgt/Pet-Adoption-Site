@@ -16,10 +16,10 @@ import contactIcon from '../../assets/contact icon.png';
 
 import leftArrow from '../../assets/left arrow.svg';
 
-const PetDetail = ({ onBackClick }) => {
+const PetDetail = ({ onBackClick, onNavigate }) => {
     return (
         <div className="pet-detail-page">
-            <Header />
+            <Header onNavigate={onNavigate} />
             
             <main className="pet-detail-main">
                 <button className="btn-back" onClick={onBackClick}>
