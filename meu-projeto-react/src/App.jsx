@@ -1,12 +1,26 @@
-import React from 'react';
-import Sandbox from './pages/Sandbox/Sandbox';
-import Playground from './pages/Playground/Playground';
+import React, { useState } from 'react';
+import PetsParaAdocao from './pages/PetsParaAdocao/PetsParaAdocao';
+import PetDetail from './pages/PetDetail/PetDetail';
 import './App.css';
 
 function App() {
+  const [currentPage, setCurrentPage] = useState('list');
+
+  const goToDetails = () => {
+    setCurrentPage('details');
+  };
+
+  const goToList = () => {
+    setCurrentPage('list');
+  };
+
   return (
     <div className="App">
-      <Sandbox /> 
+      {currentPage === 'list' ? (
+        <PetsParaAdocao onCardClick={goToDetails} onNavigate={goToList} />
+      ) : (
+        <PetDetail onBackClick={goToList} onNavigate={goToList} />
+      )}
     </div>
   );
 }
