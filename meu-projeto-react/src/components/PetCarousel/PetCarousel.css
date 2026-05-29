@@ -1,7 +1,6 @@
 .pet-carousel-container {
     position: relative;
-    width: 700px;
-    height: 482px;
+    padding: 4px; /* Espaçamento horizontal para os botões não colarem na borda */
     margin: 0 auto;
     overflow: hidden;
 }
