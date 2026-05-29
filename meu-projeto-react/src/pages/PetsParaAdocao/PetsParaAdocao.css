@@ -17,19 +17,35 @@
 .pets-adocao-content {
   flex-grow: 1;
   display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  gap: 24px;
+  flex-direction: column; /* Mudado para column para o grid ocupar 100% da largura disponível */
   padding: 20px;
-  justify-content: center;
-  align-items: flex-start;
+  box-sizing: border-box;
+  min-width: 0; /* Importante para flex containers não estourarem */
 }
 
 .pets-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, 350px);
-  gap: 25px 110px;
+  /* Reduzi o mínimo para 250px para dar mais fôlego antes de quebrar a linha */
+  grid-template-columns: repeat(3, minmax(250px, 1fr));
+  gap: 32px;
   width: 100%;
+  max-width: 1300px;
+  margin: 0 auto;
+  justify-items: center;
+}
+
+/* Ajuste para telas menores: passa para 2 colunas */
+@media (max-width: 1200px) {
+  .pets-grid {
+    grid-template-columns: repeat(2, minmax(250px, 1fr));
+  }
+}
+
+/* Ajuste para telas bem pequenas: 1 coluna */
+@media (max-width: 700px) {
+  .pets-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 768px) {

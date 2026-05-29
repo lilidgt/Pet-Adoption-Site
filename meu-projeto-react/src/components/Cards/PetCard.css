@@ -1,7 +1,7 @@
 .pet-card {
   background-color: #fff6ee; /* Fundo bege clarinho do Figma */
   border-radius: 30px; /* Casando com o border-radius do Filtro */
-  width: 440px;
+  width: 100%;
   max-width: 440px;
   overflow: hidden;
   display: flex;
