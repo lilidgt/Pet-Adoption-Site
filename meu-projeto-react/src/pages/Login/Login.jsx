@@ -13,18 +13,26 @@ const Login = ({ onLogin }) => {
         </div>
         <div className="login-right">
           <h1 className="login-title">Entre na sua Conta!</h1>
-          <form className="login-form" onSubmit={(e) => e.preventDefault()}>
+          <form 
+            className="login-form" 
+            onSubmit={(e) => {
+              e.preventDefault();
+              onLogin();
+            }}
+          >
             <input 
               type="text" 
               placeholder="E-mail" 
               className="login-input" 
+              required
             />
             <input 
               type="password" 
               placeholder="Senha" 
               className="login-input" 
+              required
             />
-            <button type="submit" className="login-button" onClick={onLogin}>
+            <button type="submit" className="login-screen-button">
               Entrar
             </button>
             <p className="login-signup-text">
