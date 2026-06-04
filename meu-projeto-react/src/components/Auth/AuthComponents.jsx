@@ -1,20 +1,17 @@
 import React from 'react';
 import './AuthComponents.css';
 
-export const AuthInput = ({ type, placeholder, required }) => (
+export const AuthInput = ({ ...props }) => (
   <input 
-    type={type} 
-    placeholder={placeholder} 
     className="auth-input" 
-    required={required}
+    {...props}
   />
 );
 
-export const AuthButton = ({ children, onClick, type = "submit" }) => (
+export const AuthButton = ({ children, ...props }) => (
   <button 
-    type={type} 
     className="auth-screen-button" 
-    onClick={onClick}
+    {...props}
   >
     {children}
   </button>
