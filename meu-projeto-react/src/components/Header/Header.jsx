@@ -3,7 +3,7 @@ import './Header.css';
 import logoText from '../../assets/logo_text.svg';
 import loginButton from '../../assets/login_button.svg';
 
-const Header = ({ onNavigate }) => {
+const Header = ({ onNavigate, onLoginClick }) => {
   return (
     <header className="header">
       <img src={logoText} alt="Logo" className="header-logo" />
@@ -23,7 +23,12 @@ const Header = ({ onNavigate }) => {
         <a href="#" className="nav-link">Cadastre Pets</a>
       </nav>
       
-      <img src={loginButton} alt="Login" className="login-button" />
+      <img 
+        src={loginButton} 
+        alt="Login" 
+        className="login-button" 
+        onClick={onLoginClick}
+      />
     </header>
   );
 };

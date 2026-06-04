@@ -25,10 +25,18 @@ function App() {
         <Login onLogin={goToList} />
       )}
       {currentPage === 'list' && (
-        <PetsParaAdocao onCardClick={goToDetails} onNavigate={goToList} />
+        <PetsParaAdocao 
+          onCardClick={goToDetails} 
+          onNavigate={goToList} 
+          onLoginClick={goToLogin} 
+        />
       )}
       {currentPage === 'details' && (
-        <PetDetail onBackClick={goToList} onNavigate={goToList} />
+        <PetDetail 
+          onBackClick={goToList} 
+          onNavigate={goToList} 
+          onLoginClick={goToLogin} 
+        />
       )}
     </div>
   );

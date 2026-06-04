@@ -5,10 +5,10 @@ import PetCard from "../../components/Cards/PetCard";
 import Footer from '../../components/Footer/Footer';
 import "./PetsParaAdocao.css";
 
-const PetsParaAdocao = ({ onCardClick, onNavigate }) => {
+const PetsParaAdocao = ({ onCardClick, onNavigate, onLoginClick }) => {
   return (
     <div className="pets-adocao-container">
-      <Header onNavigate={onNavigate} />
+      <Header onNavigate={onNavigate} onLoginClick={onLoginClick} />
 
       <main className="pets-adocao-layout">
         <Filters />
