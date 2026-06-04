@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import PetsParaAdocao from './pages/PetsParaAdocao/PetsParaAdocao';
 import PetDetail from './pages/PetDetail/PetDetail';
 import Login from './pages/Login/Login';
+import SignUp from './pages/SignUp/SignUp';
 import './App.css';
 
 function App() {
@@ -19,10 +20,17 @@ function App() {
     setCurrentPage('login');
   };
 
+  const goToSignUp = () => {
+    setCurrentPage('signup');
+  };
+
   return (
     <div className="App">
       {currentPage === 'login' && (
-        <Login onLogin={goToList} />
+        <Login onLogin={goToList} onSignUpClick={goToSignUp} />
+      )}
+      {currentPage === 'signup' && (
+        <SignUp onSignUp={goToList} onLoginClick={goToLogin} />
       )}
       {currentPage === 'list' && (
         <PetsParaAdocao 

@@ -1,8 +1,8 @@
 import React from 'react';
-import './Login.css';
+import './SignUp.css';
 import onboardingLogo from '../../assets/onboarding_logo.svg';
 
-const Login = ({ onLogin, onSignUpClick }) => {
+const SignUp = ({ onSignUp, onLoginClick }) => {
   return (
     <div className="login-container">
       <div className="login-card">
@@ -12,12 +12,12 @@ const Login = ({ onLogin, onSignUpClick }) => {
           </div>
         </div>
         <div className="login-right">
-          <h1 className="login-title">Entre na sua Conta!</h1>
+          <h1 className="login-title">Crie sua Conta!</h1>
           <form 
             className="login-form" 
             onSubmit={(e) => {
               e.preventDefault();
-              onLogin();
+              onSignUp();
             }}
           >
             <input 
@@ -33,10 +33,10 @@ const Login = ({ onLogin, onSignUpClick }) => {
               required
             />
             <button type="submit" className="login-screen-button">
-              Entrar
+              Cadastrar
             </button>
-            <p className="login-signup-text" onClick={onSignUpClick}>
-              Não possui conta? <span className="highlight">Clique aqui!</span>
+            <p className="login-signup-text" onClick={onLoginClick}>
+              Já possui conta? <span className="highlight">Clique aqui!</span>
             </p>
           </form>
         </div>
@@ -45,4 +45,4 @@ const Login = ({ onLogin, onSignUpClick }) => {
   );
 };
 
-export default Login;
+export default SignUp;
