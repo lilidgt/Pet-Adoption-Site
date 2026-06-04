@@ -1,32 +1,29 @@
 import React from "react";
 import Header from "../../components/Header/Header";
-import Filters from "../../components/Filters/Filters";
 import PetCard from "../../components/Cards/PetCard";
 import Footer from "../../components/Footer/Footer";
-import "./PetsParaAdocao.css";
+import "./Favorites.css";
 
-const PetsParaAdocao = ({
+const Favorites = ({
   onCardClick,
   onNavigate,
   onFavoritesClick,
   onLoginClick,
 }) => {
   return (
-    <div className="pets-adocao-container">
+    <div className="favorites-container">
+      {" "}
       <Header
         onNavigate={onNavigate}
         onFavoritesClick={onFavoritesClick}
         onLoginClick={onLoginClick}
       />
-
-      <main className="pets-adocao-layout">
-        <Filters />
-
-        <div className="pets-adocao-content">
+      <h1 className="page-name">Minha Casinha</h1>
+      <main className="favorites-layout">
+        {" "}
+        <div className="favorites-content">
+          {" "}
           <div className="pets-grid">
-            {/* Simulando a listagem de pets como no Sandbox */}
-            <PetCard onClick={onCardClick} />
-            <PetCard onClick={onCardClick} />
             <PetCard onClick={onCardClick} />
             <PetCard onClick={onCardClick} />
             <PetCard onClick={onCardClick} />
@@ -34,10 +31,9 @@ const PetsParaAdocao = ({
           </div>
         </div>
       </main>
-
       <Footer />
     </div>
   );
 };
 
-export default PetsParaAdocao;
+export default Favorites;

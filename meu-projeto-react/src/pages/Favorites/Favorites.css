@@ -1,0 +1,43 @@
+.favorites-container {
+  display: block;
+  width: 100%;
+  min-height: 100vh;
+}
+
+.favorites-layout {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.favorites-content {
+  width: 100%;
+}
+
+.pets-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+  padding: 20px 0;
+}
+
+.page-name {
+  font-family: "Gluten", cursive;
+  font-size: 3.5rem;
+  color: #4a2c2a;
+  text-align: center;
+  margin-top: 40px;
+  font-weight: 900;
+  letter-spacing: 2px;
+}
+
+@media (max-width: 768px) {
+  .page-name {
+    font-size: 2.2rem;
+    width: 100%;
+    max-width: 300px;
+    margin: 20px auto 0;
+    text-align: center;
+    line-height: 1.2;
+  }
+}

@@ -1,49 +1,64 @@
-import React, { useState } from 'react';
-import PetsParaAdocao from './pages/PetsParaAdocao/PetsParaAdocao';
-import PetDetail from './pages/PetDetail/PetDetail';
-import Login from './pages/Login/Login';
-import SignUp from './pages/SignUp/SignUp';
-import './App.css';
+import React, { useState } from "react";
+import PetsParaAdocao from "./pages/PetsParaAdocao/PetsParaAdocao";
+import PetDetail from "./pages/PetDetail/PetDetail";
+import Login from "./pages/Login/Login";
+import SignUp from "./pages/SignUp/SignUp";
+import Favorites from "./pages/Favorites/Favorites";
+import "./App.css";
 
 function App() {
-  const [currentPage, setCurrentPage] = useState('login');
+  const [currentPage, setCurrentPage] = useState("login");
 
   const goToDetails = () => {
-    setCurrentPage('details');
+    setCurrentPage("details");
   };
 
   const goToList = () => {
-    setCurrentPage('list');
+    setCurrentPage("list");
   };
 
   const goToLogin = () => {
-    setCurrentPage('login');
+    setCurrentPage("login");
   };
 
   const goToSignUp = () => {
-    setCurrentPage('signup');
+    setCurrentPage("signup");
+  };
+
+  const goToFavorites = () => {
+    setCurrentPage("favorites");
   };
 
   return (
     <div className="App">
-      {currentPage === 'login' && (
+      {currentPage === "login" && (
         <Login onLogin={goToList} onSignUpClick={goToSignUp} />
       )}
-      {currentPage === 'signup' && (
+      {currentPage === "signup" && (
         <SignUp onSignUp={goToList} onLoginClick={goToLogin} />
       )}
-      {currentPage === 'list' && (
-        <PetsParaAdocao 
-          onCardClick={goToDetails} 
-          onNavigate={goToList} 
-          onLoginClick={goToLogin} 
+      {currentPage === "list" && (
+        <PetsParaAdocao
+          onCardClick={goToDetails}
+          onNavigate={goToList}
+          onLoginClick={goToLogin}
+          onFavoritesClick={goToFavorites}
         />
       )}
-      {currentPage === 'details' && (
-        <PetDetail 
-          onBackClick={goToList} 
-          onNavigate={goToList} 
-          onLoginClick={goToLogin} 
+      {currentPage === "details" && (
+        <PetDetail
+          onBackClick={goToList}
+          onNavigate={goToList}
+          onLoginClick={goToLogin}
+          onFavoritesClick={goToFavorites}
+        />
+      )}
+      {currentPage === "favorites" && (
+        <Favorites
+          onCardClick={goToDetails}
+          onNavigate={goToList}
+          onFavoritesClick={goToFavorites}
+          onLoginClick={goToLogin}
         />
       )}
     </div>
