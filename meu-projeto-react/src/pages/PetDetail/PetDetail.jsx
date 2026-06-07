@@ -20,6 +20,7 @@ const PetDetail = ({
   onBackClick,
   onNavigate,
   onFavoritesClick,
+  onRegisterPetClick,
   onLoginClick,
 }) => {
   return (
@@ -27,6 +28,7 @@ const PetDetail = ({
       <Header
         onNavigate={onNavigate}
         onFavoritesClick={onFavoritesClick}
+        onRegisterPetClick={onRegisterPetClick}
         onLoginClick={onLoginClick}
       />
 

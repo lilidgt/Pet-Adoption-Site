@@ -8,6 +8,7 @@ const Favorites = ({
   onCardClick,
   onNavigate,
   onFavoritesClick,
+  onRegisterPetClick,
   onLoginClick,
 }) => {
   return (
@@ -16,6 +17,7 @@ const Favorites = ({
       <Header
         onNavigate={onNavigate}
         onFavoritesClick={onFavoritesClick}
+        onRegisterPetClick={onRegisterPetClick}
         onLoginClick={onLoginClick}
       />
       <h1 className="page-name">Minha Casinha</h1>

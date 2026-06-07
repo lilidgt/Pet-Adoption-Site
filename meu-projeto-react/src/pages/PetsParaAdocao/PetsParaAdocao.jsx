@@ -9,6 +9,7 @@ const PetsParaAdocao = ({
   onCardClick,
   onNavigate,
   onFavoritesClick,
+  onRegisterPetClick,
   onLoginClick,
 }) => {
   return (
@@ -16,6 +17,7 @@ const PetsParaAdocao = ({
       <Header
         onNavigate={onNavigate}
         onFavoritesClick={onFavoritesClick}
+        onRegisterPetClick={onRegisterPetClick}
         onLoginClick={onLoginClick}
       />
 
