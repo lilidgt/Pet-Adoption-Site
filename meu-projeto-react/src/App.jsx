@@ -4,6 +4,7 @@ import PetDetail from "./pages/PetDetail/PetDetail";
 import Login from "./pages/Login/Login";
 import SignUp from "./pages/SignUp/SignUp";
 import Favorites from "./pages/Favorites/Favorites";
+import RegisterPet from "./pages/RegisterPet/RegisterPet";
 import "./App.css";
 
 function App() {
@@ -31,6 +32,10 @@ function App() {
 
   const goToFavorites = () => {
     setCurrentPage("favorites");
+    };
+
+  const goToRegisterPet = () => {
+    setCurrentPage("register");
   };
 
   return (
@@ -47,6 +52,7 @@ function App() {
           onNavigate={goToList}
           onLoginClick={goToLogin}
           onFavoritesClick={goToFavorites}
+          onRegisterPetClick={goToRegisterPet}
         />
       )}
       {currentPage === "details" && (
@@ -56,6 +62,7 @@ function App() {
           onNavigate={goToList}
           onLoginClick={goToLogin}
           onFavoritesClick={goToFavorites}
+          onRegisterPetClick={goToRegisterPet}
         />
       )}
       {currentPage === "favorites" && (
@@ -64,6 +71,15 @@ function App() {
           onNavigate={goToList}
           onFavoritesClick={goToFavorites}
           onLoginClick={goToLogin}
+          onRegisterPetClick={goToRegisterPet}
+        />
+      )}
+      {currentPage === "register" && (
+        <RegisterPet
+          onNavigate={goToList} 
+          onFavoritesClick={goToFavorites}
+          onLoginClick={goToLogin}
+          onRegisterPetClick={goToRegisterPet}
         />
       )}
     </div>

@@ -3,7 +3,12 @@ import "./Header.css";
 import logoText from "../../assets/logo_text.svg";
 import loginButton from "../../assets/login_button.svg";
 
-const Header = ({ onNavigate, onFavoritesClick, onLoginClick }) => {
+const Header = ({
+  onNavigate,
+  onFavoritesClick,
+  onLoginClick,
+  onRegisterPetClick,
+}) => {
   return (
     <header className="header">
       <img src={logoText} alt="Logo" className="header-logo" />
@@ -29,7 +34,15 @@ const Header = ({ onNavigate, onFavoritesClick, onLoginClick }) => {
         >
           Minha Casinha
         </a>
-        <a href="#" className="nav-link">
+
+        <a
+          href="#"
+          className="nav-link"
+          onClick={(e) => {
+            e.preventDefault();
+            if (onRegisterPetClick) onRegisterPetClick();
+          }}
+        >
           Cadastre Pets
         </a>
       </nav>
