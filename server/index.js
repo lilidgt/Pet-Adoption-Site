@@ -5,11 +5,11 @@ require('dotenv').config();
 
 const app = express();
 
-// Permite que o seu React (que roda em outra porta) acesse essa API
+// Middlewares para permitir o acesso do React e leitura de JSON
 app.use(cors());
 app.use(express.json());
 
-// Configuração da conexão com a Hostinger
+// Configuração do Pool de Conexão com a Hostinger
 const db = mysql.createPool({
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
@@ -20,29 +20,34 @@ const db = mysql.createPool({
     queueLimit: 0
 });
 
-// Testando a conexão com o banco ao iniciar
-db.getConnection((err, connection) => {
-    if (err) {
-        console.error('Erro ao conectar no banco da Hostinger:', err.message);
-        console.log('Dica: Verifique se você liberou o IP do seu computador no painel da Hostinger (MySQL Remoto).');
-    } else {
-        console.log('Conexão com o MySQL da Hostinger realizada com sucesso!');
-        connection.release(); // Libera a conexão de volta para o pool
-    }
-});
+// Rota dinâmica para buscar detalhes de um pet específico pelo ID
+app.get('/pets/:id', (req, res) => {
+    const { id } = req.params; 
+    
+    const sql = `
+        SELECT p.*, u.username AS nome_dono
+        FROM pet p
+        INNER JOIN user u ON p.fk_user = u.id_user
+        WHERE p.id_pet = ?
+    `; 
 
-// Sua primeira rota de teste (Exemplo: Buscar pets)
-app.get('/api/pets', (req, res) => {
-    const sql = "SELECT * FROM pet";
-    db.query(sql, (err, results) => {
+    db.query(sql, [id], (err, results) => {
         if (err) {
-            return res.status(500).json({ error: err.message });
+            console.error('Erro ao buscar detalhes do pet e usuário:', err.message);
+            return res.status(500).json({ error: "Erro interno no servidor." });
         }
-        res.json(results);
+
+        if (results.length === 0) {
+            return res.status(404).json({ error: "Pet não encontrado." });
+        }
+
+        // Devolve o objeto do pet mesclado com os dados do usuário para o React
+        res.json(results[0]);
     });
 });
-
-const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => {
-    console.log(`Servidor backend rodando na porta ${PORT}`);
+// Alterado o nome da variavel para evitar que o .env force a porta 3306 do MySQL
+const BACKEND_PORT = 3001;
+app.listen(BACKEND_PORT, () => {
+    console.log(`Servidor backend rodando na porta ${BACKEND_PORT}`);
+    console.log('Aguardando requisicoes do React...');
 });
