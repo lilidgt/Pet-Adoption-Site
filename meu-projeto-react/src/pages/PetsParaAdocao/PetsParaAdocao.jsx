@@ -11,6 +11,16 @@ const PetsParaAdocao = ({
   onFavoritesClick,
   onLoginClick,
 }) => {
+
+  // Força o envio do ID 1 de teste ao clicar
+  const handleTestClick = () => {
+    if (onCardClick) {
+      onCardClick(1); 
+    }
+  };
+
+  const petItemTeste = { id_pet: 1 };
+
   return (
     <div className="pets-adocao-container">
       <Header
@@ -24,13 +34,12 @@ const PetsParaAdocao = ({
 
         <div className="pets-adocao-content">
           <div className="pets-grid">
-            {/* Simulando a listagem de pets como no Sandbox */}
-            <PetCard onClick={onCardClick} />
-            <PetCard onClick={onCardClick} />
-            <PetCard onClick={onCardClick} />
-            <PetCard onClick={onCardClick} />
-            <PetCard onClick={onCardClick} />
-            <PetCard onClick={onCardClick} />
+            <PetCard pet={petItemTeste} onClick={handleTestClick} />
+            <PetCard pet={petItemTeste} onClick={handleTestClick} />
+            <PetCard pet={petItemTeste} onClick={handleTestClick} />
+            <PetCard pet={petItemTeste} onClick={handleTestClick} />
+            <PetCard pet={petItemTeste} onClick={handleTestClick} />
+            <PetCard pet={petItemTeste} onClick={handleTestClick} />
           </div>
         </div>
       </main>

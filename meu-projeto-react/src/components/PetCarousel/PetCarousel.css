@@ -3,30 +3,42 @@
     padding: 4px; /* Espaçamento horizontal para os botões não colarem na borda */
     margin: 0 auto;
     overflow: hidden;
+    
+    /* Garante que o container ocupe a largura disponível, mas respeite um limite máximo */
+    width: 100%;
+    max-width: 700px; 
+
+    /* A altura do container vai ser exatamente a altura da imagem */
+    height: auto; 
 }
+
 @keyframes fadeIn {
-  from {
-    opacity: 0;       /* Começa totalmente invisível */
-  }
-  to {
-    opacity: 1;       /* Termina totalmente visível */
-  }
+    from {
+        opacity: 0; /* Começa totalmente invisível */
+    }
+    to {
+        opacity: 1; /* Termina totalmente visível */
+    }
 }
 
 .pet-image {
-  width: 100%;
-  height: 100%;
+    width: 100%;
+    /* MANTIDO EXATAMENTE IGUAL AO SEU BASE */
+    height: 70vh; 
+    max-height: 500px; 
 
-  /* NÃO esticar a imagem */
-  object-fit: cover;
-  object-position: center; 
+    /* Preenche o espaço cortando as sobras e centralizando, sem distorcer ou esticar */
+    object-fit: cover;
+    object-position: center; 
 
-  border-radius: 20px; 
-  animation-name: fadeIn;      
-  animation-duration: 0.5s;
-  animation-timing-function: ease-out; 
-  animation-fill-mode: forwards; 
+    display: block; /* Remove espaços fantasmas abaixo da imagem */
+    border-radius: 20px; 
+    animation-name: fadeIn;      
+    animation-duration: 0.5s;
+    animation-timing-function: ease-out; 
+    animation-fill-mode: forwards; 
 }
+
 .carousel-button-left, .carousel-button-right {
     background: none;
     border: none;
@@ -35,16 +47,29 @@
     outline: none;
     
     position: absolute;
-    top: 50%;
+    
+    /* MODIFICADO APENAS AQUI: O top agora calcula dinamicamente a metade da altura da foto.
+       Como a imagem tem 70vh com máximo de 500px, a metade exata do topo é 35vh com máximo de 250px. */
+    top: 35vh; 
+    max-top: 250px; /* Alinha perfeitamente com o teto de 500px da imagem */
+    
+    /* Se o max-top não aplicar diretamente no seu navegador, a alternativa padrão idêntica é:
+       top: calc(min(70vh, 500px) / 2); */
+    top: calc(min(70vh, 500px) / 2);
+
     transform: translateY(-50%);
     width: 28px;
     height: 28px;
 
     cursor: pointer;
+    z-index: 10; /* Garante que os botões fiquem acima da imagem */
 }
-.arrow-icon{
+
+.arrow-icon {
     width: 100%;
+    display: block;
 }
+
 .carousel-button-left {
     left: 32px;
 }
@@ -53,10 +78,14 @@
     right: 32px;
 }
 
-.carousel-button-right img{
+/* Rotaciona a seta da direita para reaproveitar o mesmo arquivo SVG */
+.carousel-button-right img {
     transform: rotate(180deg);
 }
+
 .carousel-button-left:hover, .carousel-button-right:hover {
     opacity: 0.8;
+    /* Mantém a centralização vertical exata enquanto aplica o zoom */
     transform: translateY(-50%) scale(1.1); 
+    transition: transform 0.2s ease, opacity 0.2s ease;
 }

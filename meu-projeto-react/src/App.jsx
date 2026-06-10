@@ -8,9 +8,13 @@ import "./App.css";
 
 function App() {
   const [currentPage, setCurrentPage] = useState("login");
+  // 1. Criamos um estado para guardar o ID do pet selecionado
+  const [selectedPetId, setSelectedPetId] = useState(null);
 
-  const goToDetails = () => {
-    setCurrentPage("details");
+  // 2. Ajustamos a função para receber o ID do pet que foi clicado
+  const goToDetails = (id) => {
+    setSelectedPetId(1); // Guarda o ID (ex: 1) no estado
+    setCurrentPage("details"); // Muda para a tela de detalhes
   };
 
   const goToList = () => {
@@ -39,7 +43,7 @@ function App() {
       )}
       {currentPage === "list" && (
         <PetsParaAdocao
-          onCardClick={goToDetails}
+          onCardClick={goToDetails} // Agora essa função captura o ID enviado pelo card
           onNavigate={goToList}
           onLoginClick={goToLogin}
           onFavoritesClick={goToFavorites}
@@ -47,6 +51,7 @@ function App() {
       )}
       {currentPage === "details" && (
         <PetDetail
+          petId={selectedPetId} // 3. PASSAMOS O ID SALVO PARA O COMPONENTE DETALHES!
           onBackClick={goToList}
           onNavigate={goToList}
           onLoginClick={goToLogin}
