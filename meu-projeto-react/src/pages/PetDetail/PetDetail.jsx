@@ -133,11 +133,8 @@ const PetDetail = ({
                 brincar e receber carinho. Ele está ansioso para encontrar o seu
                 humano favorito. Será que é você?
               </p>
-            </div>
 
-            {/* Card de Contato */}
-            <div className="contact-row-display">
-              <div className="info-card responsible-info">
+              <div className="responsible-info">
                 <img
                   src={personIcon}
                   alt="Responsável"
@@ -145,12 +142,13 @@ const PetDetail = ({
                 />
                 <div>
                   <p className="contact-display-label">Responsável</p>
-                  <p className="contact-display-value">
-                    Lar temporário alecrim
-                  </p>
+                  <p className="contact-display-value">Lar temporário</p>
                 </div>
               </div>
+            </div>
 
+            {/* Card de Contato */}
+            <div className="contact-row-display">
               <button className="info-card btn-contact-submit">
                 <img
                   src={contactIcon}
