@@ -21,6 +21,8 @@ const PetDetail = ({
   onNavigate,
   onLoginClick,
   onEditClick,
+  onFavoritesClick,
+  onRegisterPetClick,
 }) => {
   const [pet, setPet] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -55,9 +57,12 @@ const PetDetail = ({
     // 2. Se o usuário estiver logado, checa se este pet já está favoritado (na minha casinha)
     if (userId) {
       const token = localStorage.getItem("token");
-      fetch(`http://localhost:3001/favoritos/check?id_user=${userId}&id_pet=${petId}`, {
-        headers: { "Authorization": `Bearer ${token}` }
-      })
+      fetch(
+        `http://localhost:3001/favoritos/check?id_user=${userId}&id_pet=${petId}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      )
         .then((res) => res.json())
         .then((data) => setIsFavorited(data.isFavorited))
         .catch((err) => console.error("Erro ao checar favorito:", err));
@@ -74,11 +79,11 @@ const PetDetail = ({
     const token = localStorage.getItem("token");
     fetch("http://localhost:3001/favoritos/toggle", {
       method: "POST",
-      headers: { 
+      headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
+        Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({ id_user: userId, id_pet: petId })
+      body: JSON.stringify({ id_user: userId, id_pet: petId }),
     })
       .then((res) => res.json())
       .then((data) => {
@@ -116,7 +121,12 @@ const PetDetail = ({
 
   return (
     <div className="pet-detail-page">
-      <Header onNavigate={onNavigate} onLoginClick={onLoginClick} />
+      <Header
+        onNavigate={onNavigate}
+        onLoginClick={onLoginClick}
+        onFavoritesClick={onFavoritesClick}
+        onRegisterPetClick={onRegisterPetClick}
+      />
 
       <main className="pet-detail-main">
         <div className="pet-detail-header">
@@ -125,7 +135,10 @@ const PetDetail = ({
             Voltar
           </button>
           <div className="admin-actions">
-            <button className="btn-edit-admin" onClick={() => onEditClick(petId)}>
+            <button
+              className="btn-edit-admin"
+              onClick={() => onEditClick(petId)}
+            >
               Editar
             </button>
             <button className="btn-delete-admin" onClick={handleDeleteClick}>
