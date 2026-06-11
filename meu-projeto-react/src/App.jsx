@@ -5,17 +5,16 @@ import Login from "./pages/Login/Login";
 import SignUp from "./pages/SignUp/SignUp";
 import Favorites from "./pages/Favorites/Favorites";
 import RegisterPet from "./pages/RegisterPet/RegisterPet";
+import EditPet from "./pages/EditPet/EditPet"; // Importando a nova tela de edição
 import "./App.css";
 
 function App() {
   const [currentPage, setCurrentPage] = useState("login");
-  // 1. Criamos um estado para guardar o ID do pet selecionado
   const [selectedPetId, setSelectedPetId] = useState(null);
 
-  // 2. Ajustamos a função para receber o ID do pet que foi clicado
   const goToDetails = (id) => {
-    setSelectedPetId(id); // Agora ele salva dinamicamente o ID correto!
-    setCurrentPage("details"); // Muda para a tela de detalhes
+    setSelectedPetId(id);
+    setCurrentPage("details");
   };
 
   const goToList = () => {
@@ -32,10 +31,16 @@ function App() {
 
   const goToFavorites = () => {
     setCurrentPage("favorites");
-    };
+  };
 
   const goToRegisterPet = () => {
     setCurrentPage("register");
+  };
+
+  // Nova função para ir para a tela de edição
+  const goToEditPet = (id) => {
+    setSelectedPetId(id);
+    setCurrentPage("edit");
   };
 
   return (
@@ -43,28 +48,33 @@ function App() {
       {currentPage === "login" && (
         <Login onLogin={goToList} onSignUpClick={goToSignUp} />
       )}
+
       {currentPage === "signup" && (
         <SignUp onSignUp={goToList} onLoginClick={goToLogin} />
       )}
+
       {currentPage === "list" && (
         <PetsParaAdocao
-          onCardClick={goToDetails} // Agora essa função captura o ID enviado pelo card
+          onCardClick={goToDetails}
           onNavigate={goToList}
           onLoginClick={goToLogin}
           onFavoritesClick={goToFavorites}
           onRegisterPetClick={goToRegisterPet}
         />
       )}
+
       {currentPage === "details" && (
         <PetDetail
-          petId={selectedPetId} // 3. PASSAMOS O ID SALVO PARA O COMPONENTE DETALHES!
+          petId={selectedPetId}
           onBackClick={goToList}
           onNavigate={goToList}
           onLoginClick={goToLogin}
           onFavoritesClick={goToFavorites}
           onRegisterPetClick={goToRegisterPet}
+          onEditClick={goToEditPet} // Passando a função para o botão de editar
         />
       )}
+
       {currentPage === "favorites" && (
         <Favorites
           onCardClick={goToDetails}
@@ -74,12 +84,25 @@ function App() {
           onRegisterPetClick={goToRegisterPet}
         />
       )}
+
       {currentPage === "register" && (
         <RegisterPet
-          onNavigate={goToList} 
+          onNavigate={goToList}
           onFavoritesClick={goToFavorites}
           onLoginClick={goToLogin}
           onRegisterPetClick={goToRegisterPet}
+        />
+      )}
+
+      {/* Nova Rota para Edição */}
+      {currentPage === "edit" && (
+        <EditPet
+          petId={selectedPetId}
+          onNavigate={goToList}
+          onFavoritesClick={goToFavorites}
+          onLoginClick={goToLogin}
+          onRegisterPetClick={goToRegisterPet}
+          onBackClick={() => goToDetails(selectedPetId)} // O voltar da edição volta pro detalhe
         />
       )}
     </div>

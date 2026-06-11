@@ -14,6 +14,14 @@
   box-sizing: border-box;
 }
 
+.pet-detail-top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 24px;
+}
+
 .btn-back {
   align-self: flex-start;
   display: flex;
@@ -25,7 +33,7 @@
   font-size: 1.1rem;
   font-weight: bold;
   cursor: pointer;
-  margin-bottom: 20px;
+  margin-bottom: 0;
   transition: transform 0.2s;
   font-family: inherit;
 }
@@ -36,6 +44,46 @@
 
 .btn-back img {
   width: 20px;
+}
+
+.admin-action-buttons {
+  display: flex;
+  gap: 12px;
+}
+
+.btn-admin {
+  padding: 8px 20px;
+  border-radius: 20px;
+  font-family: inherit;
+  font-weight: bold;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-edit {
+  background-color: #fdf7e9;
+  color: #532d2d;
+  border: 2px solid #532d2d;
+}
+
+.btn-edit:hover {
+  background-color: #f8e1bf;
+  transform: translateY(-2px);
+}
+
+.btn-delete {
+  background-color: transparent;
+  color: #cc0000;
+  border: 2px solid #cc0000;
+}
+
+.btn-delete:hover {
+  background-color: #fcced6;
+  transform: translateY(-2px);
 }
 
 .pet-detail-container {
@@ -303,5 +351,11 @@
 
   .pet-display-name {
     font-size: 2.2rem;
+  }
+
+  .pet-detail-top-bar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
   }
 }
