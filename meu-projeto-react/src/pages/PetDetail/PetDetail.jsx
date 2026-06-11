@@ -19,6 +19,8 @@ const PetDetail = ({
   onNavigate,
   onLoginClick,
   onEditClick,
+  onFavoritesClick,
+  onRegisterPetClick,
 }) => {
   const [pet, setPet] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -50,7 +52,12 @@ const PetDetail = ({
 
   return (
     <div className="pet-detail-page">
-      <Header onNavigate={onNavigate} onLoginClick={onLoginClick} />
+      <Header
+        onNavigate={onNavigate}
+        onFavoritesClick={onFavoritesClick}
+        onRegisterPetClick={onRegisterPetClick}
+        onLoginClick={onLoginClick}
+      />
 
       <main className="pet-detail-main">
         {/* NOVO CABEÇALHO COM BOTÃO VOLTAR E AÇÕES */}
