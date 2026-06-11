@@ -71,6 +71,54 @@ app.post('/pets', upload.fields([
   });
 });
 
+// --- ROTA: ATUALIZAR PET ---
+app.put('/pets/:id', upload.fields([
+  { name: 'profile_photo', maxCount: 1 },
+  { name: 'others_photos_videos', maxCount: 6 }
+]), (req, res) => {
+  const { id } = req.params;
+  const {
+    name, species, age, size, city,
+    state, gender, vaccine, castrated,
+    description, personality, contact
+  } = req.body;
+
+  let sql = `
+    UPDATE pet SET 
+      name=?, species=?, age=?, size=?, city=?, 
+      state=?, gender=?, vaccine=?, castrated=?, 
+      description=?, personality=?, contact=?
+  `;
+  const values = [
+    name, species, age, size, city, 
+    state, gender, vaccine, castrated, 
+    description, personality, contact
+  ];
+
+  if (req.files && req.files['profile_photo']) {
+    sql += `, profile_photo=?`;
+    values.push(req.files['profile_photo'][0].filename);
+  }
+
+  if (req.files && req.files['others_photos_videos']) {
+    const others = req.files['others_photos_videos'];
+    const others_photos_videos = others.map(f => f.filename).join(',');
+    sql += `, others_photos_videos=?`;
+    values.push(others_photos_videos);
+  }
+
+  sql += ` WHERE id_pet=?`;
+  values.push(id);
+
+  db.query(sql, values, (err, result) => {
+    if (err) {
+      console.error('Erro ao atualizar pet:', err);
+      return res.status(500).json({ message: 'Erro ao atualizar pet.' });
+    }
+    res.json({ message: 'Pet atualizado com sucesso!' });
+  });
+});
+
 // --- ROTA PARA PEGAR TODOS OS PETS CADASTRADOS (Com INNER JOIN) ---
 app.get('/pets', (req, res) => {
     const sql = `

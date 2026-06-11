@@ -14,8 +14,15 @@
   box-sizing: border-box;
 }
 
+.pet-detail-header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
 .btn-back {
-  align-self: flex-start;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -25,7 +32,6 @@
   font-size: 1.1rem;
   font-weight: bold;
   cursor: pointer;
-  margin-bottom: 20px;
   transition: transform 0.2s;
   font-family: inherit;
 }
@@ -36,6 +42,43 @@
 
 .btn-back img {
   width: 20px;
+}
+
+.admin-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.btn-edit-admin,
+.btn-delete-admin {
+  padding: 8px 20px;
+  border-radius: 20px;
+  border: 2px solid #532d2d;
+  font-family: "Gluten", cursive;
+  font-weight: bold;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-edit-admin {
+  background-color: #fdf7e9;
+  color: #532d2d;
+}
+
+.btn-edit-admin:hover {
+  background-color: #532d2d;
+  color: #fdf7e9;
+}
+
+.btn-delete-admin {
+  background-color: #ff6b6b;
+  color: #ffffff;
+}
+
+.btn-delete-admin:hover {
+  background-color: #fa5252;
+  border-color: #fa5252;
 }
 
 .pet-detail-container {

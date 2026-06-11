@@ -15,7 +15,13 @@ import personIcon from "../../assets/person icon.svg";
 import contactIcon from "../../assets/contact icon.png";
 import leftArrow from "../../assets/left arrow.svg";
 
-const PetDetail = ({ petId, onBackClick, onNavigate, onLoginClick }) => {
+const PetDetail = ({
+  petId,
+  onBackClick,
+  onNavigate,
+  onLoginClick,
+  onEditClick,
+}) => {
   const [pet, setPet] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -77,6 +83,26 @@ const PetDetail = ({ petId, onBackClick, onNavigate, onLoginClick }) => {
       .catch((err) => console.error("Erro ao alternar favorito:", err));
   };
 
+  // Função para excluir o pet
+  const handleDeleteClick = () => {
+    if (
+      window.confirm(`Tem certeza que deseja excluir o anúncio do ${pet.name}?`)
+    ) {
+      fetch(`http://localhost:3001/pets/${petId}`, {
+        method: "DELETE",
+      })
+        .then((res) => {
+          if (res.ok) {
+            alert("Pet excluído com sucesso!");
+            onBackClick(); // Volta para a lista
+          } else {
+            alert("Erro ao excluir pet.");
+          }
+        })
+        .catch((err) => console.error("Erro ao excluir pet:", err));
+    }
+  };
+
   // 4. Telas de transição (Carregando ou Erro)
   if (loading)
     return <div className="loading">Carregando detalhes do pet...</div>;
@@ -88,10 +114,20 @@ const PetDetail = ({ petId, onBackClick, onNavigate, onLoginClick }) => {
       <Header onNavigate={onNavigate} onLoginClick={onLoginClick} />
 
       <main className="pet-detail-main">
-        <button className="btn-back" onClick={onBackClick}>
-          <img src={leftArrow} alt="Voltar" />
-          Voltar
-        </button>
+        <div className="pet-detail-header">
+          <button className="btn-back" onClick={onBackClick}>
+            <img src={leftArrow} alt="Voltar" />
+            Voltar
+          </button>
+          <div className="admin-actions">
+            <button className="btn-edit-admin" onClick={() => onEditClick(petId)}>
+              Editar
+            </button>
+            <button className="btn-delete-admin" onClick={handleDeleteClick}>
+              Excluir
+            </button>
+          </div>
+        </div>
         <div className="pet-detail-container">
           {/* Coluna Esquerda: Ações, Carrossel e Nome */}
           <section className="pet-left-column">
