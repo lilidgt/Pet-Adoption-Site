@@ -20,7 +20,98 @@ const db = mysql.createPool({
     queueLimit: 0
 });
 
-// --- ROTA DE SIGN UP (CADASTRO) ---
+// Configuração do Multer (Declarado apenas UMA vez)
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, path.join(__dirname, '../meu-projeto-react/src/assets/photos')); // ajusta o nome da pasta do frontend se necessário
+  },
+  filename: (req, file, cb) => {
+    const uniqueName = Date.now() + '-' + Math.round(Math.random() * 1e9);
+    const ext = path.extname(file.originalname);
+    cb(null, uniqueName + ext);
+  }
+});
+const upload = multer({ storage });
+
+// --- ROTA: CADASTRAR PET ---
+app.post('/pets', upload.fields([
+  { name: 'profile_photo', maxCount: 1 },
+  { name: 'others_photos_videos', maxCount: 6 }
+]), (req, res) => {
+  const {
+    name, species, age, size, city,
+    state, gender, vaccine, castrated,
+    description, personality, contact, fk_user
+  } = req.body;
+
+  const profile_photo = req.files['profile_photo']?.[0]?.filename || null;
+  const others = req.files['others_photos_videos'] || [];
+  const others_photos_videos = others.map(f => f.filename).join(',') || null;
+
+  const sql = `
+    INSERT INTO pet 
+      (name, profile_photo, others_photos_videos, species, age, size, city, state, gender, vaccine, castrated, description, personality, contact, fk_user)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `;
+
+  const values = [
+    name, profile_photo, others_photos_videos,
+    species, age, size, city, state, gender,
+    vaccine, castrated, description, personality,
+    contact, fk_user
+  ];
+
+  db.query(sql, values, (err, result) => {
+    if (err) {
+      console.error('Erro ao cadastrar pet:', err);
+      return res.status(500).json({ message: 'Erro ao cadastrar pet.' });
+    }
+    res.json({ message: 'Pet cadastrado com sucesso!', id: result.insertId });
+  });
+});
+
+// --- ROTA PARA PEGAR TODOS OS PETS CADASTRADOS (Com INNER JOIN) ---
+app.get('/pets', (req, res) => {
+    const sql = `
+        SELECT p.*, u.username AS nome_dono
+        FROM pet p
+        INNER JOIN user u ON p.fk_user = u.id_user
+    `; 
+
+    db.query(sql, (err, results) => {
+        if (err) {
+            console.error('Erro ao buscar todos os pets:', err.message);
+            return res.status(500).json({ error: "Erro interno no servidor." });
+        }
+
+        // Se o banco estiver vazio, devolve um array vazio [] com status 200 (sucesso)
+        if (results.length === 0) {
+            return res.json([]);
+        }
+
+        // Devolve a lista (array) com todos os pets para o React
+        res.json(results);
+    });
+});
+
+// --- ROTA DE DETALHES DE UM PET ESPECÍFICO ---
+app.get('/pets/:id', (req, res) => {
+    const { id } = req.params; 
+    const sql = `
+        SELECT p.*, u.username AS nome_dono
+        FROM pet p
+        INNER JOIN user u ON p.fk_user = u.id_user
+        WHERE p.id_pet = ?
+    `; 
+
+    db.query(sql, [id], (err, results) => {
+        if (err) return res.status(500).json({ error: "Erro interno." });
+        if (results.length === 0) return res.status(404).json({ error: "Pet não encontrado." });
+        res.json(results[0]);
+    });
+});
+
+// --- ROTA DE SIGN UP (CADASTRO DE USUÁRIO) ---
 app.post('/signup', async (req, res) => {
     const { username, email, password, isAdotante, isDoador } = req.body;
 
@@ -157,6 +248,8 @@ const verifyToken = (req, res, next) => {
 
 // ROTA PARA ADICIONAR OU REMOVER DOS FAVORITOS (Protegida)
 app.post('/favoritos/toggle', verifyToken, (req, res) => {
+// --- ROTA PARA ADICIONAR OU REMOVER DOS FAVORITOS ---
+app.post('/favoritos/toggle', (req, res) => {
     const { id_user, id_pet } = req.body;
 
     if (!id_user || !id_pet) {
@@ -202,7 +295,6 @@ app.get('/favoritos/check', verifyToken, (req, res) => {
 app.get('/favoritos/:id_user', verifyToken, (req, res) => {
     const { id_user } = req.params;
     
-    // Log para ver se o ID do usuário está chegando certo do frontend
     console.log("-> Recebida requisição de favoritos para o id_user:", id_user);
 
     const sql = `
@@ -215,7 +307,6 @@ app.get('/favoritos/:id_user', verifyToken, (req, res) => {
 
     db.query(sql, [id_user], (err, results) => {
         if (err) {
-            // ISSO AQUI VAI PRINTAR O ERRO REAL NO SEU TERMINAL DO NODE
             console.error('--- ERRO REAL DO MYSQL ---');
             console.error(err.message);
             console.error('--------------------------');
@@ -225,6 +316,7 @@ app.get('/favoritos/:id_user', verifyToken, (req, res) => {
     });
 });
 
+// Alterado o nome da variavel para evitar que o .env force a porta 3306 do MySQL
 const BACKEND_PORT = 3001;
 app.listen(BACKEND_PORT, () => {
     console.log(`Servidor backend rodando na porta ${BACKEND_PORT}`);
