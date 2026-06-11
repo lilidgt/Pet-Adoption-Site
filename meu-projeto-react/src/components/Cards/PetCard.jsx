@@ -3,34 +3,53 @@ import "./PetCard.css";
 import imagemExemplo from "../../assets/imagemExemplo.jpg";
 
 const PetCard = ({ pet = {}, onClick }) => {
-  //Se estiver vazio, só pro exemplo
+  // Configuração do Mock de segurança
   const mockDefault = {
-    image: imagemExemplo,
+    profile_photo: "",
     city: "Curitiba",
     state: "PR",
     name: "Cowboy",
     age: 2,
     species: "Tartaruga",
     gender: "Macho",
-    isCastrated: true,
-    isVaccinated: true,
-    personalities: ["Brincalhão", "Protetor", "Calmo", "Enérgico"],
+    castrated: "Não",
+    vaccine: "Não vacinado",
+    personality: "Dócil",
   };
 
   const finalPet = { ...mockDefault, ...pet };
 
   const {
-    image,
+    profile_photo,
     city,
     state,
     name,
     age,
     species,
     gender,
-    isCastrated,
-    isVaccinated,
-    personalities,
+    castrated,
+    vaccine,
+    personality,
   } = finalPet;
+
+  // --- LÓGICA DA IMAGEM DINÂMICA ---
+  let finalImage = imagemExemplo;
+  if (profile_photo && profile_photo.trim() !== "") {
+    try {
+      finalImage = new URL(`../../assets/photos/${profile_photo}`, import.meta.url).href;
+    } catch (error) {
+      console.error("Erro ao carregar a imagem do pet:", error);
+      finalImage = imagemExemplo;
+    }
+  }
+
+  // --- TRATAMENTO DAS PERSONALIDADES ---
+  const personalitiesArray = personality
+    ? personality
+        .split(",")
+        .map((trait) => trait.trim())
+        .filter((trait) => trait.length > 0)
+    : [];
 
   return (
     <article 
@@ -40,7 +59,7 @@ const PetCard = ({ pet = {}, onClick }) => {
     >
       <div className="pet-card-image-container">
         <img
-          src={image}
+          src={finalImage}
           alt={`Foto do pet ${name}`}
           className="pet-card-image"
         />
@@ -68,7 +87,7 @@ const PetCard = ({ pet = {}, onClick }) => {
 
         <div className="pet-card-specs">
           <span>
-            {age} {age === 1 ? "ano" : "anos"}
+            {age} {Number(age) === 1 ? "ano" : "anos"}
           </span>
           <span className="divider">•</span>
           <span>{species}</span>
@@ -77,16 +96,28 @@ const PetCard = ({ pet = {}, onClick }) => {
         </div>
 
         <div className="pet-card-status-container">
-          {isCastrated && (
-            <span className="status-tag status-castrado">Castrado</span>
+          {/* Validação de Castração */}
+          {castrated && castrated.trim() !== "" && (
+            <span className="status-tag status-castrado">
+              {castrated.trim().toLowerCase() === "sim" ? "Castrado" : "Não castrado"}
+            </span>
           )}
-          {isVaccinated && (
-            <span className="status-tag status-vacina">Vacina em dia</span>
+          
+          {/* Validação de Vacina */}
+          {vaccine && vaccine.trim() !== "" && (
+            <span className="status-tag status-vacina">
+              {(() => {
+                const v = vaccine.trim().toLowerCase();
+                if (v === "em dia") return "Vacina em dia";
+                if (v === "incompleto") return "Vacina incompleta";
+                return "Não vacinado"; // Para o caso de 'não vacinado' ou qualquer outro valor
+              })()}
+            </span>
           )}
         </div>
 
         <div className="pet-card-personalities-container">
-          {personalities.map((trait, index) => (
+          {personalitiesArray.map((trait, index) => (
             <span key={index} className="personality-tag">
               {trait}
             </span>
