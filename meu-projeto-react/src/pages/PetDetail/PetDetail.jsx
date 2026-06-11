@@ -73,10 +73,23 @@ const PetDetail = ({
               className="btn-admin btn-delete"
               onClick={() => {
                 if (
-                  window.confirm("Tem certeza que deseja excluir este pet?")
+                  window.confirm(
+                    "Tem certeza que deseja excluir este pet da plataforma?",
+                  )
                 ) {
-                  // Lógica de exclusão no banco (fetch DELETE) aqui
-                  console.log("Excluir pet:", petId);
+                  // Chama a nova rota DELETE do backend
+                  fetch(`http://localhost:3001/pets/${petId}`, {
+                    method: "DELETE",
+                  })
+                    .then((response) => {
+                      if (!response.ok) throw new Error("Erro ao deletar");
+                      alert("Pet excluído com sucesso!");
+                      onNavigate(); // Volta para a tela de lista de pets
+                    })
+                    .catch((err) => {
+                      console.error(err);
+                      alert("Erro ao tentar excluir o pet.");
+                    });
                 }
               }}
             >
@@ -84,7 +97,6 @@ const PetDetail = ({
             </button>
           </div>
         </div>
-
         <div className="pet-detail-container">
           <section className="pet-left-column">
             <div className="pet-action-buttons">

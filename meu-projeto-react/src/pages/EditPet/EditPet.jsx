@@ -82,22 +82,15 @@ const AttachCard = ({ label, accept, icon, onFileSelect }) => {
   );
 };
 
-// miniatura da foto/video
-const ThumbSlot = ({ isEmpty, preview: previewProp, onChange }) => {
-  const [preview, setPreview] = useState(previewProp || null);
+// CORREÇÃO 1: miniatura da foto/video simplificada e sem erro de useEffect
+const ThumbSlot = ({ isEmpty, preview, onChange }) => {
   const inputRef = useRef(null);
 
   const handleChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    const url = URL.createObjectURL(file);
-    setPreview(url);
     if (onChange) onChange(file);
   };
-
-  useEffect(() => {
-    setPreview(previewProp || null);
-  }, [previewProp]);
 
   return (
     <div
@@ -123,13 +116,13 @@ const ThumbSlot = ({ isEmpty, preview: previewProp, onChange }) => {
 };
 
 //pagina principal de edição do pet
+// CORREÇÃO 2: onBackClick removido dos parâmetros para evitar o erro de 'unused-vars'
 const EditPet = ({
   petId,
   onNavigate,
   onFavoritesClick,
   onRegisterPetClick,
   onLoginClick,
-  onBackClick,
 }) => {
   const [form, setForm] = useState({
     nome: "",
@@ -148,6 +141,12 @@ const EditPet = ({
   const [toast, setToast] = useState(null);
   const mainPhotoRef = useRef(null);
 
+  // CORREÇÃO 3: showToast movido para CIMA do useEffect para ele conseguir enxergá-la
+  const showToast = (msg) => {
+    setToast(msg);
+    setTimeout(() => setToast(null), 3000);
+  };
+
   // Função auxiliar para arrumar a URL da imagem vinda do banco
   const getImageUrl = (imagePath) => {
     if (!imagePath) return null;
@@ -165,12 +164,23 @@ const EditPet = ({
     fetch(`http://localhost:3001/pets/${petId}`)
       .then((response) => response.json())
       .then((data) => {
+        // Padroniza o gênero para bater com as opções do Select
+        let generoDB = data.gender || "";
+        if (
+          generoDB.toLowerCase().includes("femea") ||
+          generoDB.toLowerCase().includes("fêmea")
+        ) {
+          generoDB = "Fêmea";
+        } else if (generoDB.toLowerCase().includes("macho")) {
+          generoDB = "Macho";
+        }
+
         setForm({
           nome: data.name || "",
           especie: data.species || "",
           porte: data.size || "",
           idade: data.age || "",
-          genero: data.gender || "",
+          genero: generoDB,
           personalidade: "",
           contato: data.contact || "",
           endereco: data.address || "",
@@ -186,12 +196,10 @@ const EditPet = ({
           );
         }
 
-        // Arrumando a URL da foto principal
         if (data.profile_photo) {
           setMainPhoto(getImageUrl(data.profile_photo));
         }
 
-        // Arrumando as URLs das miniaturas
         if (data.others_photos_videos) {
           const adicionais = data.others_photos_videos
             .split(",")
@@ -238,11 +246,6 @@ const EditPet = ({
     const file = e.target.files[0];
     if (!file) return;
     setMainPhoto(URL.createObjectURL(file));
-  };
-
-  const showToast = (msg) => {
-    setToast(msg);
-    setTimeout(() => setToast(null), 3000);
   };
 
   const handleSubmit = (e) => {
@@ -380,8 +383,8 @@ const EditPet = ({
 
           {/* formulario de editar pet */}
           <form className="cadastre-form" onSubmit={handleSubmit} noValidate>
-            {/* linha 1: Nome / Animal / Espécie */}
-            <div className="form-row form-row--3">
+            {/* linha 1: Nome / Espécie */}
+            <div className="form-row form-row--2">
               <div className="field-group">
                 <label htmlFor="nome">Nome</label>
                 <input
@@ -447,8 +450,8 @@ const EditPet = ({
                     onChange={handleField}
                   >
                     <option value="">Selecione</option>
-                    <option value="femea">Fêmea</option>
-                    <option value="macho">Macho</option>
+                    <option value="Fêmea">Fêmea</option>
+                    <option value="Macho">Macho</option>
                   </select>
                 </div>
                 <div className="field-group">
