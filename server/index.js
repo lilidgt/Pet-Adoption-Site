@@ -145,19 +145,43 @@ app.get('/pets', (req, res) => {
 
 // --- ROTA DE DETALHES DE UM PET ESPECÍFICO ---
 app.get('/pets/:id', (req, res) => {
-    const { id } = req.params; 
-    const sql = `
+  const { id } = req.params;
+  const sql = `
         SELECT p.*, u.username AS nome_dono
         FROM pet p
         INNER JOIN user u ON p.fk_user = u.id_user
         WHERE p.id_pet = ?
-    `; 
+    `;
 
-    db.query(sql, [id], (err, results) => {
-        if (err) return res.status(500).json({ error: "Erro interno." });
-        if (results.length === 0) return res.status(404).json({ error: "Pet não encontrado." });
-        res.json(results[0]);
+  db.query(sql, [id], (err, results) => {
+    if (err) return res.status(500).json({ error: "Erro interno." });
+    if (results.length === 0) return res.status(404).json({ error: "Pet não encontrado." });
+    res.json(results[0]);
+  });
+});
+
+// --- ROTA: EXCLUIR PET ---
+app.delete('/pets/:id', (req, res) => {
+  const { id } = req.params;
+
+  // Primeiro removemos dos favoritos para evitar erro de chave estrangeira
+  const sqlDeleteFavorites = "DELETE FROM minha_casinha WHERE fk_pet_id = ?";
+
+  db.query(sqlDeleteFavorites, [id], (err) => {
+    if (err) {
+      console.error('Erro ao excluir favoritos do pet:', err);
+      return res.status(500).json({ message: 'Erro ao excluir pet (favoritos).' });
+    }
+
+    const sqlDeletePet = "DELETE FROM pet WHERE id_pet = ?";
+    db.query(sqlDeletePet, [id], (err, result) => {
+      if (err) {
+        console.error('Erro ao excluir pet:', err);
+        return res.status(500).json({ message: 'Erro ao excluir pet.' });
+      }
+      res.json({ message: 'Pet excluído com sucesso!' });
     });
+  });
 });
 
 // --- ROTA DE SIGN UP (CADASTRO DE USUÁRIO) ---
