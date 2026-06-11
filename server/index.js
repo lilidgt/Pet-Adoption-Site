@@ -104,6 +104,31 @@ app.get('/pets/:id', (req, res) => {
     });
 });
 
+// ROTA PARA PEGAR TODOS OS PETS CADASTRADOS
+app.get('/pets', (req, res) => {
+    const sql = `
+        SELECT p.*, u.username AS nome_dono
+        FROM pet p
+        INNER JOIN user u ON p.fk_user = u.id_user
+    `; 
+
+    db.query(sql, (err, results) => {
+        if (err) {
+            console.error('Erro ao buscar todos os pets:', err.message);
+            return res.status(500).json({ error: "Erro interno no servidor." });
+        }
+
+        // Se o banco estiver vazio, devolve um array vazio [] com status 200 (sucesso)
+        if (results.length === 0) {
+            return res.json([]);
+        }
+
+        // Devolve a lista (array) com todos os pets para o React
+        res.json(results);
+    });
+});
+
+
 const BACKEND_PORT = 3001;
 app.listen(BACKEND_PORT, () => {
     console.log(`Servidor backend rodando na porta ${BACKEND_PORT}`);
