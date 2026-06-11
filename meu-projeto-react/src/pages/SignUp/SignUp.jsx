@@ -20,9 +20,30 @@ const SignUp = ({ onSignUp, onLoginClick }) => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onSignUp(formData);
+    
+    try {
+      const response = await fetch('http://localhost:3001/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        alert("Cadastro realizado com sucesso!");
+        onLoginClick(); // Redireciona para o login após sucesso
+      } else {
+        alert(data.error || "Erro ao realizar cadastro.");
+      }
+    } catch (error) {
+      console.error("Erro ao conectar com o servidor:", error);
+      alert("Não foi possível conectar ao servidor. Verifique se o backend está rodando.");
+    }
   };
 
   return (
