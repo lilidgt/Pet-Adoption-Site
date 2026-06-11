@@ -48,7 +48,10 @@ const PetDetail = ({ petId, onBackClick, onNavigate, onLoginClick }) => {
 
     // 2. Se o usuário estiver logado, checa se este pet já está favoritado (na minha casinha)
     if (userId) {
-      fetch(`http://localhost:3001/favoritos/check?id_user=${userId}&id_pet=${petId}`)
+      const token = localStorage.getItem("token");
+      fetch(`http://localhost:3001/favoritos/check?id_user=${userId}&id_pet=${petId}`, {
+        headers: { "Authorization": `Bearer ${token}` }
+      })
         .then((res) => res.json())
         .then((data) => setIsFavorited(data.isFavorited))
         .catch((err) => console.error("Erro ao checar favorito:", err));
@@ -62,9 +65,13 @@ const PetDetail = ({ petId, onBackClick, onNavigate, onLoginClick }) => {
       return;
     }
 
+    const token = localStorage.getItem("token");
     fetch("http://localhost:3001/favoritos/toggle", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { 
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
       body: JSON.stringify({ id_user: userId, id_pet: petId })
     })
       .then((res) => res.json())

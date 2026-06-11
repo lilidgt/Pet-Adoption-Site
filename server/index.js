@@ -2,6 +2,7 @@ const express = require('express');
 const mysql = require('mysql2');
 const cors = require('cors');
 const bcrypt = require('bcrypt'); // Para segurança das senhas
+const jwt = require('jsonwebtoken'); // Para geração de tokens
 require('dotenv').config();
 
 const app = express();
@@ -73,8 +74,16 @@ app.post('/login', (req, res) => {
         const match = await bcrypt.compare(password, user.password);
 
         if (match) {
+            // Gera o token JWT
+            const token = jwt.sign(
+                { id: user.id_user, username: user.username, type: user.user_type },
+                process.env.JWT_SECRET || 'fallback_secret_key_123',
+                { expiresIn: '1h' } // Token expira em 1 hora
+            );
+
             res.json({ 
                 message: "Login realizado!", 
+                token: token,
                 user: { 
                     id: user.id_user, 
                     username: user.username,
@@ -128,8 +137,26 @@ app.get('/pets', (req, res) => {
     });
 });
 
-// ROTA PARA ADICIONAR OU REMOVER DOS FAVORITOS
-app.post('/favoritos/toggle', (req, res) => {
+// --- MIDDLEWARE DE AUTENTICAÇÃO JWT ---
+const verifyToken = (req, res, next) => {
+    const authHeader = req.headers['authorization'];
+    if (!authHeader) return res.status(401).json({ error: "Acesso negado. Token não fornecido." });
+
+    // O token geralmente vem no formato "Bearer MEU_TOKEN"
+    const token = authHeader.split(' ')[1];
+    if (!token) return res.status(401).json({ error: "Acesso negado. Token mal formatado." });
+
+    try {
+        const verified = jwt.verify(token, process.env.JWT_SECRET || 'fallback_secret_key_123');
+        req.user = verified; // Adiciona as informações do usuário logado na requisição
+        next(); // Permite que a rota continue executando
+    } catch (err) {
+        res.status(403).json({ error: "Token inválido ou expirado." });
+    }
+};
+
+// ROTA PARA ADICIONAR OU REMOVER DOS FAVORITOS (Protegida)
+app.post('/favoritos/toggle', verifyToken, (req, res) => {
     const { id_user, id_pet } = req.body;
 
     if (!id_user || !id_pet) {
@@ -160,8 +187,8 @@ app.post('/favoritos/toggle', (req, res) => {
     });
 });
 
-//ROTA PARA VERIFICAR SE UM PET ESPECÍFICO JÁ É FAVORITO DO USUÁRIO
-app.get('/favoritos/check', (req, res) => {
+//ROTA PARA VERIFICAR SE UM PET ESPECÍFICO JÁ É FAVORITO DO USUÁRIO (Protegida)
+app.get('/favoritos/check', verifyToken, (req, res) => {
     const { id_user, id_pet } = req.query;
 
     const sql = "SELECT * FROM minha_casinha WHERE fk_user_id = ? AND fk_pet_id = ?";
@@ -171,8 +198,8 @@ app.get('/favoritos/check', (req, res) => {
     });
 });
 
-//ROTA PARA LISTAR TODOS OS PETS FAVORITOS DE UM USUÁRIO
-app.get('/favoritos/:id_user', (req, res) => {
+//ROTA PARA LISTAR TODOS OS PETS FAVORITOS DE UM USUÁRIO (Protegida)
+app.get('/favoritos/:id_user', verifyToken, (req, res) => {
     const { id_user } = req.params;
     
     // Log para ver se o ID do usuário está chegando certo do frontend
