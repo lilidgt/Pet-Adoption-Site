@@ -27,7 +27,7 @@ const PetDetail = ({ petId, onBackClick, onNavigate, onLoginClick }) => {
 
   useEffect(() => {
     setLoading(true);
-    
+
     // 1. Busca os detalhes do pet baseado no petId recebido por propriedade
     fetch(`http://localhost:3001/pets/${petId}`)
       .then((response) => {
@@ -48,7 +48,9 @@ const PetDetail = ({ petId, onBackClick, onNavigate, onLoginClick }) => {
 
     // 2. Se o usuário estiver logado, checa se este pet já está favoritado (na minha casinha)
     if (userId) {
-      fetch(`http://localhost:3001/favoritos/check?id_user=${userId}&id_pet=${petId}`)
+      fetch(
+        `http://localhost:3001/favoritos/check?id_user=${userId}&id_pet=${petId}`,
+      )
         .then((res) => res.json())
         .then((data) => setIsFavorited(data.isFavorited))
         .catch((err) => console.error("Erro ao checar favorito:", err));
@@ -65,7 +67,7 @@ const PetDetail = ({ petId, onBackClick, onNavigate, onLoginClick }) => {
     fetch("http://localhost:3001/favoritos/toggle", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id_user: userId, id_pet: petId })
+      body: JSON.stringify({ id_user: userId, id_pet: petId }),
     })
       .then((res) => res.json())
       .then((data) => {
@@ -91,19 +93,18 @@ const PetDetail = ({ petId, onBackClick, onNavigate, onLoginClick }) => {
           Voltar
         </button>
         <div className="pet-detail-container">
-          
           {/* Coluna Esquerda: Ações, Carrossel e Nome */}
           <section className="pet-left-column">
             <div className="pet-action-buttons">
               {/* Botão de Favorito Dinâmico adicionado aqui */}
-              <button 
-                className={`btn-favorite-action ${isFavorited ? 'active' : ''}`}
+              <button
+                className={`btn-favorite-action ${isFavorited ? "active" : ""}`}
                 onClick={handleFavoriteClick}
               >
                 <img src={houseIcon} alt="Favorito" />
                 {isFavorited ? "Na minha Casinha!" : "Favorito"}
               </button>
-              
+
               <button
                 className="btn-adopt-action"
                 onClick={() => {
@@ -122,7 +123,9 @@ const PetDetail = ({ petId, onBackClick, onNavigate, onLoginClick }) => {
                       "_blank",
                     );
                   } else {
-                    alert("Este responsável não cadastrou um número de contato.");
+                    alert(
+                      "Este responsável não cadastrou um número de contato.",
+                    );
                   }
                 }}
               >
@@ -165,7 +168,7 @@ const PetDetail = ({ petId, onBackClick, onNavigate, onLoginClick }) => {
                   <div>
                     <p className="stat-display-label">Idade</p>
                     <p className="stat-display-value">
-                      {pet.age} {pet.age === 1 ? 'ano' : 'anos'}
+                      {pet.age} {pet.age === 1 ? "ano" : "anos"}
                     </p>
                   </div>
                 </div>
@@ -216,7 +219,6 @@ const PetDetail = ({ petId, onBackClick, onNavigate, onLoginClick }) => {
               </div>
 
               <div className="pet-tags-list">
-                (
                 {pet.personality ? (
                   pet.personality
                     .replace(/"/g, "")

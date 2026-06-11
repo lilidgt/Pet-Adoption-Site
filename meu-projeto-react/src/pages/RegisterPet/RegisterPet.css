@@ -178,20 +178,19 @@
   display: grid;
   gap: 16px;
 }
-.form-row--3    { grid-template-columns: 1fr 1fr 1fr; }
 .form-row--2    { grid-template-columns: 1fr 1fr; }
 
 .form-row--porte-desc {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 16px;
+  gap: 20px;
   align-items: start;
 }
 
 .form-fields-stack {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 20px;
 }
 
 /* descrição ocupa altura total na linha porte+desc */
@@ -235,7 +234,8 @@
 
 .field-input--textarea {
   resize: none;
-  height: 207px;
+  height: 237px;
+  min-height: 237px;
   line-height: 1.55;
 }
 
@@ -417,14 +417,12 @@
 @media (max-width: 768px) {
   .cadastre-main { padding: 24px 16px 40px; }
   .cadastre-title { font-size: 32px; }
-  .form-row--3 { grid-template-columns: 1fr 1fr; }
   .form-row--porte-desc { grid-template-columns: 1fr; }
   .field-group--desc { grid-row: unset; }
   .attach-sections { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 480px) {
-  .form-row--3 { grid-template-columns: 1fr; }
   .form-row--2 { grid-template-columns: 1fr; }
   .btn-cadastrar { width: 100%; text-align: center; }
   .form-actions { justify-content: center; }

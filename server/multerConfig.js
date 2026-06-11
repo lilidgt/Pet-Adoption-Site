@@ -1,0 +1,17 @@
+const multer = require('multer');
+const path = require('path');
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, path.join(__dirname, '../meu-projeto-react/src/photos')); // pasta onde salva
+  },
+  filename: (req, file, cb) => {
+    const uniqueName = Date.now() + '-' + Math.round(Math.random() * 1e9);
+    const ext = path.extname(file.originalname); // pega a extensão original (.jpg, .png...)
+    cb(null, uniqueName + ext); 
+  }
+});
+
+const upload = multer({ storage });
+
+module.exports = upload;
