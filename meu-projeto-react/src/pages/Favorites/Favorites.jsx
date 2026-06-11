@@ -26,12 +26,8 @@ const Favorites = ({
       return;
     }
 
-    const token = localStorage.getItem("token");
-
     // Busca os pets favoritados do usuário atual
-    fetch(`http://localhost:3001/favoritos/${userId}`, {
-      headers: { "Authorization": `Bearer ${token}` }
-    })
+    fetch(`http://localhost:3001/favoritos/${userId}`)
       .then((response) => {
         if (!response.ok) {
           throw new Error("Erro ao carregar a lista de favoritos.");
