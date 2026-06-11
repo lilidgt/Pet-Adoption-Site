@@ -5,6 +5,7 @@ import Login from "./pages/Login/Login";
 import SignUp from "./pages/SignUp/SignUp";
 import Favorites from "./pages/Favorites/Favorites";
 import RegisterPet from "./pages/RegisterPet/RegisterPet";
+import EditPet from "./pages/EditPet/EditPet";
 import "./App.css";
 
 function App() {
@@ -16,6 +17,11 @@ function App() {
   const goToDetails = (id) => {
     setSelectedPetId(id); // Agora ele salva dinamicamente o ID correto!
     setCurrentPage("details"); // Muda para a tela de detalhes
+  };
+
+  const goToEdit = (id) => {
+    setSelectedPetId(id);
+    setCurrentPage("edit");
   };
 
   const goToList = () => {
@@ -63,6 +69,7 @@ function App() {
           onLoginClick={goToLogin}
           onFavoritesClick={goToFavorites}
           onRegisterPetClick={goToRegisterPet}
+          onEditClick={goToEdit}
         />
       )}
       {currentPage === "favorites" && (
@@ -77,6 +84,15 @@ function App() {
       {currentPage === "register" && (
         <RegisterPet
           onNavigate={goToList} 
+          onFavoritesClick={goToFavorites}
+          onLoginClick={goToLogin}
+          onRegisterPetClick={goToRegisterPet}
+        />
+      )}
+      {currentPage === "edit" && (
+        <EditPet
+          petId={selectedPetId}
+          onNavigate={goToDetails} // Após editar, volta para os detalhes do pet
           onFavoritesClick={goToFavorites}
           onLoginClick={goToLogin}
           onRegisterPetClick={goToRegisterPet}
