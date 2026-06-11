@@ -69,6 +69,7 @@ const RegisterPet = ({ onNavigate, onFavoritesClick, onRegisterPetClick, onLogin
   const [statesList, setStatesList] = useState([]);
   const [citiesList, setCitiesList] = useState([]);
   const [loadingCities, setLoadingCities] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false); // Estado para evitar cliques duplos
   const [mainPhoto, setMainPhoto] = useState(null);
   const [mediaPreviews, setMediaPreviews] = useState([null, null, null]);
   const [toast, setToast] = useState(null);
@@ -115,7 +116,7 @@ const RegisterPet = ({ onNavigate, onFavoritesClick, onRegisterPetClick, onLogin
     if (!personalityTags.includes(tag)) {
       setPersonalityTags((prev) => [...prev, tag]);
     }
-    setForm((prev) => ({ ...prev, personalidade: "" }));
+    setForm((prev) => ({ ...prev, personalidad: "" }));
   };
 
   const handlePersonalityKeyDown = (e) => {
@@ -143,7 +144,12 @@ const RegisterPet = ({ onNavigate, onFavoritesClick, onRegisterPetClick, onLogin
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!form.nome.trim()) { showToast("⚠️ Por favor, insira o nome do pet."); return; }
+    if (!form.nome.trim()) { 
+      showToast("⚠️ Por favor, insira o nome do pet."); 
+      return; 
+    }
+
+    setIsSubmitting(true);
 
     const data = new FormData();
 
@@ -165,7 +171,7 @@ const RegisterPet = ({ onNavigate, onFavoritesClick, onRegisterPetClick, onLogin
     data.append('contact', contatoFormatado);
     data.append('fk_user', 1);
 
-    // foto principal (você precisa guardar o File, não só a URL)
+    // foto principal
     if (mainPhotoFile) data.append('profile_photo', mainPhotoFile);
 
     // outras fotos
@@ -173,21 +179,33 @@ const RegisterPet = ({ onNavigate, onFavoritesClick, onRegisterPetClick, onLogin
       if (file) data.append('others_photos_videos', file);
     });
 
-  const response = await fetch('http://localhost:3001/pets', {
-    method: 'POST',
-    body: data
-  });
+    try {
+      const response = await fetch('http://localhost:3001/pets', {
+        method: 'POST',
+        body: data
+      });
 
-  const result = await response.json();
-  showToast(`🐾 Pet "${form.nome}" cadastrado com sucesso!`);
-  setTimeout(() => onNavigate('home'), 1500);
-};
+      if (!response.ok) {
+        throw new Error('Resposta inválida do servidor');
+      }
 
-const handleMediaAttach = (file, idx) => {
-  if (!file) return;
-  setMediaFiles(prev => { const c = [...prev]; c[idx] = file; return c; }); // guarda o File
-  setMediaPreviews(prev => { const c = [...prev]; c[idx] = URL.createObjectURL(file); return c; });
-};
+      const result = await response.json();
+      showToast(`🐾 Pet "${form.nome}" cadastrado com sucesso!`);
+      setTimeout(() => onNavigate('home'), 1500);
+
+    } catch (error) {
+      console.error("Erro ao conectar ou processar requisição:", error);
+      showToast("❌ Não foi possível conectar ao servidor. Certifique-se de que o back-end está rodando.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleMediaAttach = (file, idx) => {
+    if (!file) return;
+    setMediaFiles(prev => { const c = [...prev]; c[idx] = file; return c; }); // guarda o File
+    setMediaPreviews(prev => { const c = [...prev]; c[idx] = URL.createObjectURL(file); return c; });
+  };
 
   return (
     <div className="cadastre-container">
@@ -322,8 +340,7 @@ const handleMediaAttach = (file, idx) => {
                   placeholder="Insira a idade do pet"
                   value={form.idade}
                   onChange={handleField}
-                >
-                </input>
+                />
               </div>
             </div>
 
@@ -372,7 +389,7 @@ const handleMediaAttach = (file, idx) => {
                 />
               </div>
 
-              {/* Coluna Direita: Vacinação e Castrado empilhados verticalmente */}
+              {/* Coluna Direita: Vacinação, Castrado e Cidade */}
               <div className="form-fields-stack">
                 <div className="field-group">
                   <label htmlFor="vacinacao">Vacinação</label>
@@ -434,9 +451,8 @@ const handleMediaAttach = (file, idx) => {
               </div>
             </div>
 
-            {/* linha 4: Cidade / Estado / Contato organizados em colunas */}
+            {/* linha 4: Estado / Contato */}
             <div className="form-row form-row--2">
-
               <div className="field-group">
                 <label htmlFor="estado">Estado</label>
                 <select
@@ -471,8 +487,8 @@ const handleMediaAttach = (file, idx) => {
             </div>
 
             <div className="form-actions">
-              <button type="submit" className="btn-cadastrar">
-                Cadastrar pet 🐾
+              <button type="submit" className="btn-cadastrar" disabled={isSubmitting}>
+                {isSubmitting ? "Enviando... 🐾" : "Cadastrar pet 🐾"}
               </button>
             </div>
           </form>
