@@ -102,21 +102,25 @@ const ThumbSlot = ({ isEmpty, preview: previewProp, onChange }) => {
 const RegisterPet = ({ onNavigate, onFavoritesClick, onRegisterPetClick, onLoginClick }) => {
   const [form, setForm] = useState({
     nome: "",
-    animal: "",
     especie: "",
-    porte: "",
     idade: "",
+    porte: "",
+    cidade: "",
+    estado: "",
     genero: "",
-    personalidade: "",
+    vacinacao: "",
+    castrado: "",
     contato: "",
-    endereco: "",
     descricao: "",
+    personalidade: "",
   });
   const [personalityTags, setPersonalityTags] = useState([]);
   const [mainPhoto, setMainPhoto] = useState(null);
   const [mediaPreviews, setMediaPreviews] = useState([null, null, null]);
   const [toast, setToast] = useState(null);
   const mainPhotoRef = useRef(null);
+  const [mainPhotoFile, setMainPhotoFile] = useState(null);
+  const [mediaFiles, setMediaFiles] = useState([null, null, null]);
 
   const handleField = (e) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -145,7 +149,8 @@ const RegisterPet = ({ onNavigate, onFavoritesClick, onRegisterPetClick, onLogin
   const handleMainPhoto = (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    setMainPhoto(URL.createObjectURL(file));
+    setMainPhotoFile(file);                        // guarda o File
+    setMainPhoto(URL.createObjectURL(file));        // guarda a URL só pro preview
   };
 
   const showToast = (msg) => {
@@ -153,24 +158,50 @@ const RegisterPet = ({ onNavigate, onFavoritesClick, onRegisterPetClick, onLogin
     setTimeout(() => setToast(null), 3000);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!form.nome.trim()) {
-      showToast("⚠️ Por favor, insira o nome do pet.");
-      return;
-    }
-    showToast(`🐾 Pet "${form.nome}" cadastrado com sucesso!`);
-  };
+    if (!form.nome.trim()) { showToast("⚠️ Por favor, insira o nome do pet."); return; }
 
-  const handleMediaAttach = (file, idx) => {
-    if (!file) return;
-    const url = URL.createObjectURL(file);
-    setMediaPreviews((prev) => {
-      const copy = [...prev];
-      copy[idx] = url;
-      return copy;
+    const data = new FormData();
+
+    // campos de texto
+    data.append('name', form.nome);
+    data.append('species', form.especie);
+    data.append('age', form.idade);
+    data.append('size', form.porte);
+    data.append('city', form.cidade);
+    data.append('state', form.estado);
+    data.append('gender', form.genero);
+    data.append('vaccine', form.vacinacao);
+    data.append('castrated', form.castrado);
+    data.append('description', form.descricao);
+    data.append('personality', personalityTags.join(','));
+    data.append('contact', form.contato);
+    data.append('fk_user', 1);
+
+    // foto principal (você precisa guardar o File, não só a URL)
+    if (mainPhotoFile) data.append('profile_photo', mainPhotoFile);
+
+    // outras fotos
+    mediaFiles.forEach(file => {
+      if (file) data.append('others_photos_videos', file);
     });
-  };
+
+  const response = await fetch('http://localhost:3001/pets', {
+    method: 'POST',
+    body: data
+  });
+
+  const result = await response.json();
+  showToast(`🐾 Pet "${form.nome}" cadastrado com sucesso!`);
+  setTimeout(() => onNavigate('home'), 1500);
+};
+
+const handleMediaAttach = (file, idx) => {
+  if (!file) return;
+  setMediaFiles(prev => { const c = [...prev]; c[idx] = file; return c; }); // guarda o File
+  setMediaPreviews(prev => { const c = [...prev]; c[idx] = URL.createObjectURL(file); return c; });
+};
 
   const DOC_LABELS = [
     "Carteirinha de vacinação",
@@ -263,8 +294,8 @@ const RegisterPet = ({ onNavigate, onFavoritesClick, onRegisterPetClick, onLogin
           {/* formulario de cadastro pet */}
           <form className="cadastre-form" onSubmit={handleSubmit} noValidate>
 
-            {/* linha 1: Nome / Animal / Espécie */}
-            <div className="form-row form-row--3">
+            {/* linha 1: Nome / Espécie */}
+            <div className="form-row form-row--2">
               <div className="field-group">
                 <label htmlFor="nome">Nome</label>
                 <input
@@ -278,112 +309,175 @@ const RegisterPet = ({ onNavigate, onFavoritesClick, onRegisterPetClick, onLogin
                 />
               </div>
               <div className="field-group">
-                <label htmlFor="animal">Animal</label>
-                <input
-                  id="animal"
-                  name="animal"
-                  type="text"
-                  className="field-input"
-                  placeholder="Insira o animal"
-                  value={form.animal}
-                  onChange={handleField}
-                />
-              </div>
-              <div className="field-group">
                 <label htmlFor="especie">Espécie</label>
-                <input
+                <select
                   id="especie"
                   name="especie"
-                  type="text"
                   className="field-input"
-                  placeholder="Insira a espécie do pet"
                   value={form.especie}
                   onChange={handleField}
+                >
+                  <option value="">Selecione</option>
+                  <option value="Cachorro">Cachorro</option>
+                  <option value="Gato">Gato</option>
+                  <option value="Roedor">Roedor</option>
+                </select>
+              </div>
+            </div>
+
+            {/* linha 2: Porte/Idade/Gênero e Personalidade */}
+            <div className="form-row form-row--2">
+              <div className="field-group">
+                <label htmlFor="porte">Porte</label>
+                <select
+                  id="porte"
+                  name="porte"
+                  className="field-input"
+                  value={form.porte}
+                  onChange={handleField}
+                >
+                  <option value="">Selecione</option>
+                  <option value="Pequeno">Pequeno</option>
+                  <option value="Médio">Médio</option>
+                  <option value="Grande">Grande</option>
+                </select>
+              </div>
+
+              <div className="field-group">
+                <label htmlFor="idade">Idade</label>
+                <input
+                  id="idade"
+                  name="idade"
+                  type="number"
+                  min="0"
+                  className="field-input"
+                  placeholder="Insira a idade do pet"
+                  value={form.idade}
+                  onChange={handleField}
+                >
+                </input>
+              </div>
+            </div>
+
+            <div className="form-row form-row--2">
+              <div className="field-group">
+                <label htmlFor="genero">Gênero</label>
+                <select
+                  id="genero"
+                  name="genero"
+                  className="field-input"
+                  value={form.genero}
+                  onChange={handleField}
+                >
+                  <option value="">Selecione</option>
+                  <option value="Fêmea">Fêmea</option>
+                  <option value="Macho">Macho</option>
+                </select>
+              </div>
+
+              <div className="field-group">
+                <label htmlFor="personalidade">Personalidade</label>
+                <input
+                  id="personalidade"
+                  name="personalidade"
+                  type="text"
+                  className="field-input"
+                  placeholder="Digite e pressione Enter"
+                  value={form.personalidade}
+                  onChange={handleField}
+                  onKeyDown={handlePersonalityKeyDown}
                 />
               </div>
             </div>
 
-            {/* linha 2: Porte/Idade/Gênero e descrição e contato */}
+            {/* linha 3: Descrição e Vacinação/Castrado lado a lado */}
             <div className="form-row form-row--porte-desc">
+              <div className="field-group field-group--desc">
+                <label htmlFor="descricao">Descrição</label>
+                <textarea
+                  id="descricao"
+                  name="descricao"
+                  className="field-input field-input--textarea"
+                  placeholder="Conte um pouco sobre a história do seu pet"
+                  value={form.descricao}
+                  onChange={handleField}
+                />
+              </div>
+
+              {/* Coluna Direita: Vacinação e Castrado empilhados verticalmente */}
               <div className="form-fields-stack">
                 <div className="field-group">
-                  <label htmlFor="porte">Porte</label>
-                  <input
-                    id="porte"
-                    name="porte"
-                    type="text"
-                    className="field-input"
-                    placeholder="Insira o porte do pet"
-                    value={form.porte}
-                    onChange={handleField}
-                  />
-                </div>
-                <div className="field-group">
-                  <label htmlFor="idade">Idade</label>
-                  <input
-                    id="idade"
-                    name="idade"
-                    type="number"
-                    min="0"
-                    className="field-input"
-                    placeholder="Insira a idade do pet"
-                    value={form.idade}
-                    onChange={handleField}
-                  />
-                </div>
-                <div className="field-group">
-                  <label htmlFor="genero">Gênero</label>
+                  <label htmlFor="vacinacao">Vacinação</label>
                   <select
-                    id="genero"
-                    name="genero"
+                    id="vacinacao"
+                    name="vacinacao"
                     className="field-input"
-                    value={form.genero}
+                    value={form.vacinacao}
                     onChange={handleField}
                   >
                     <option value="">Selecione</option>
-                    <option value="femea">Fêmea</option>
-                    <option value="macho">Macho</option>
+                    <option value="Em dia">Em dia</option>
+                    <option value="Incompleto">Incompleto</option>
+                    <option value="Não vacinado">Não vacinado</option>
                   </select>
                 </div>
+
                 <div className="field-group">
-                  <label htmlFor="personalidade">Personalidade</label>
-                  <input
-                    id="personalidade"
-                    name="personalidade"
-                    type="text"
+                  <label htmlFor="castrado">Castrado</label>
+                  <select
+                    id="castrado"
+                    name="castrado"
                     className="field-input"
-                    placeholder="Digite e pressione Enter"
-                    value={form.personalidade}
+                    value={form.castrado}
                     onChange={handleField}
-                    onKeyDown={handlePersonalityKeyDown}
-                  />
+                  >
+                    <option value="">Selecione</option>
+                    <option value="Sim">Sim</option>
+                    <option value="Não">Não</option>
+                  </select>
                 </div>
+
+                <div className="field-group">
+                <label htmlFor="cidade">Cidade</label>
+                <input
+                  id="cidade"
+                  name="cidade"
+                  type="text"
+                  className="field-input"
+                  value={form.cidade}
+                  onChange={handleField}
+                />
               </div>
-              <div className="form-fields-stack">
-                <div className="field-group field-group--desc">
-                  <label htmlFor="descricao">Descrição</label>
-                  <textarea
-                    id="descricao"
-                    name="descricao"
-                    className="field-input field-input--textarea"
-                    placeholder="Conte um pouco sobre a história do seu pet"
-                    value={form.descricao}
-                    onChange={handleField}
-                  />
-                </div>
-                <div className="field-group">
-                  <label htmlFor="contato">Contato</label>
-                  <input
-                    id="contato"
-                    name="contato"
-                    type="tel"
-                    inputMode="tel"
-                    className="field-input"
-                    placeholder="Número para contato"
-                    value={form.contato}
-                    onChange={handleField}
-                  />
-                </div>
+              </div>
+            </div>
+
+            {/* linha 4: Cidade / Estado / Contato organizados em colunas */}
+            <div className="form-row form-row--2">
+
+              <div className="field-group">
+                <label htmlFor="estado">Estado</label>
+                <input
+                  id="estado"
+                  name="estado"
+                  type="text"
+                  className="field-input"
+                  value={form.estado}
+                  onChange={handleField}
+                />
+              </div>
+
+              <div className="field-group">
+                <label htmlFor="contato">Contato</label>
+                <input
+                  id="contato"
+                  name="contato"
+                  type="tel"
+                  inputMode="tel"
+                  className="field-input"
+                  placeholder="Número para contato"
+                  value={form.contato}
+                  onChange={handleField}
+                />
               </div>
             </div>
 
