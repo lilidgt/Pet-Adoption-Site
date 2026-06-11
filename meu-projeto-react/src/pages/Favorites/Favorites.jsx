@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Header from "../../components/Header/Header";
 import PetCard from "../../components/Cards/PetCard";
 import Footer from "../../components/Footer/Footer";
@@ -11,9 +11,42 @@ const Favorites = ({
   onRegisterPetClick,
   onLoginClick,
 }) => {
+  const [favoritePets, setFavoritePets] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Recupera o ID do usuário logado do localStorage
+  const loggedUser = JSON.parse(localStorage.getItem("user")) || null;
+  const userId = loggedUser?.id;
+
+  useEffect(() => {
+    if (!userId) {
+      setError("Você precisa estar logado para ver seus favoritos.");
+      setLoading(false);
+      return;
+    }
+
+    // Busca os pets favoritados do usuário atual
+    fetch(`http://localhost:3001/favoritos/${userId}`)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Erro ao carregar a lista de favoritos.");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        setFavoritePets(data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Erro no fetch de favoritos:", err);
+        setError(err.message);
+        setLoading(false);
+      });
+  }, [userId]);
+
   return (
     <div className="favorites-container">
-      {" "}
       <Header
         onNavigate={onNavigate}
         onFavoritesClick={onFavoritesClick}
@@ -21,15 +54,30 @@ const Favorites = ({
         onLoginClick={onLoginClick}
       />
       <h1 className="page-name">Minha Casinha</h1>
+      
       <main className="favorites-layout">
-        {" "}
         <div className="favorites-content">
-          {" "}
           <div className="pets-grid">
-            <PetCard onClick={onCardClick} />
-            <PetCard onClick={onCardClick} />
-            <PetCard onClick={onCardClick} />
-            <PetCard onClick={onCardClick} />
+            {/* 1. Tela de Carregamento */}
+            {loading && <p>Carregando seus pets favoritos...</p>}
+
+            {/* 2. Tela de Erro ou falta de Login */}
+            {error && <p className="error-message">{error}</p>}
+
+            {/* 3. Se não houver erro, terminou de carregar e a lista está vazia */}
+            {!loading && !error && favoritePets.length === 0 && (
+              <p>Sua casinha está vazia. Favorite alguns pets para vê-los aqui!</p>
+            )}
+
+            {/* 4. Renderiza a lista de favoritos real vinda do banco */}
+            {!loading && !error && favoritePets.length > 0 &&
+              favoritePets.map((petItem) => (
+                <PetCard
+                  key={petItem.id_pet}
+                  pet={petItem}
+                  onClick={() => onCardClick && onCardClick(petItem.id_pet)}
+                />
+              ))}
           </div>
         </div>
       </main>

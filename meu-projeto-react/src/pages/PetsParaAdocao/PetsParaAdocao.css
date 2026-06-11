@@ -12,20 +12,25 @@
   max-width: 100%; 
   padding: 0 32px; 
   box-sizing: border-box;
+  
+  align-items: flex-start; 
+  position: relative;
 }
 
 .pets-adocao-content {
   flex-grow: 1;
   display: flex;
-  flex-direction: column; /* Mudado para column para o grid ocupar 100% da largura disponível */
+  flex-direction: column;
   padding: 20px;
   box-sizing: border-box;
-  min-width: 0; /* Importante para flex containers não estourarem */
+  min-width: 0;
+
+  max-height: calc(100vh - 160px); 
+  overflow-y: auto; 
 }
 
 .pets-grid {
   display: grid;
-  /* Reduzi o mínimo para 250px para dar mais fôlego antes de quebrar a linha */
   grid-template-columns: repeat(3, minmax(250px, 1fr));
   gap: 32px;
   width: 100%;
@@ -34,14 +39,13 @@
   justify-items: center;
 }
 
-/* Ajuste para telas menores: passa para 2 colunas */
 @media (max-width: 1200px) {
   .pets-grid {
     grid-template-columns: repeat(2, minmax(250px, 1fr));
   }
 }
 
-/* Ajuste para telas bem pequenas: 1 coluna */
+
 @media (max-width: 700px) {
   .pets-grid {
     grid-template-columns: 1fr;
@@ -52,5 +56,10 @@
   .pets-adocao-layout {
     flex-direction: column;
     padding: 0 16px; 
+  }
+
+  .pets-adocao-content {
+    max-height: none;
+    overflow-y: visible;
   }
 }
