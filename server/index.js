@@ -128,6 +128,75 @@ app.get('/pets', (req, res) => {
     });
 });
 
+// ROTA PARA ADICIONAR OU REMOVER DOS FAVORITOS
+app.post('/favoritos/toggle', (req, res) => {
+    const { id_user, id_pet } = req.body;
+
+    if (!id_user || !id_pet) {
+        return res.status(400).json({ error: "Usuário e Pet são obrigatórios." });
+    }
+
+    // Primeiro, verifica se a relação já existe na tabela 'minha_casinha'
+    const checkSql = "SELECT * FROM minha_casinha WHERE fk_user_id = ? AND fk_pet_id = ?";
+    
+    db.query(checkSql, [id_user, id_pet], (err, results) => {
+        if (err) return res.status(500).json({ error: "Erro ao verificar favoritos." });
+
+        if (results.length > 0) {
+            // Se já existe, o usuário quer DESFAVORITAR (Deletar a relação)
+            const deleteSql = "DELETE FROM minha_casinha WHERE fk_user_id = ? AND fk_pet_id = ?";
+            db.query(deleteSql, [id_user, id_pet], (err) => {
+                if (err) return res.status(500).json({ error: "Erro ao remover dos favoritos." });
+                return res.json({ isFavorited: false, message: "Removido da minha casinha!" });
+            });
+        } else {
+            // Se não existe, o usuário quer FAVORITAR (Inserir a relação)
+            const insertSql = "INSERT INTO minha_casinha (fk_user_id, fk_pet_id) VALUES (?, ?)";
+            db.query(insertSql, [id_user, id_pet], (err) => {
+                if (err) return res.status(500).json({ error: "Erro ao adicionar aos favoritos." });
+                return res.json({ isFavorited: true, message: "Adicionado à minha casinha!" });
+            });
+        }
+    });
+});
+
+//ROTA PARA VERIFICAR SE UM PET ESPECÍFICO JÁ É FAVORITO DO USUÁRIO
+app.get('/favoritos/check', (req, res) => {
+    const { id_user, id_pet } = req.query;
+
+    const sql = "SELECT * FROM minha_casinha WHERE fk_user_id = ? AND fk_pet_id = ?";
+    db.query(sql, [id_user, id_pet], (err, results) => {
+        if (err) return res.status(500).json({ error: "Erro ao checar status de favorito." });
+        res.json({ isFavorited: results.length > 0 });
+    });
+});
+
+//ROTA PARA LISTAR TODOS OS PETS FAVORITOS DE UM USUÁRIO
+app.get('/favoritos/:id_user', (req, res) => {
+    const { id_user } = req.params;
+    
+    // Log para ver se o ID do usuário está chegando certo do frontend
+    console.log("-> Recebida requisição de favoritos para o id_user:", id_user);
+
+    const sql = `
+        SELECT p.*, u.username AS nome_dono
+        FROM pet p
+        INNER JOIN minha_casinha mc ON p.id_pet = mc.fk_pet_id
+        INNER JOIN user u ON p.fk_user = u.id_user
+        WHERE mc.fk_user_id = ?
+    `;
+
+    db.query(sql, [id_user], (err, results) => {
+        if (err) {
+            // ISSO AQUI VAI PRINTAR O ERRO REAL NO SEU TERMINAL DO NODE
+            console.error('--- ERRO REAL DO MYSQL ---');
+            console.error(err.message);
+            console.error('--------------------------');
+            return res.status(500).json({ error: err.message });
+        }
+        res.json(results);
+    });
+});
 
 const BACKEND_PORT = 3001;
 app.listen(BACKEND_PORT, () => {
