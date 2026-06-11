@@ -3,6 +3,9 @@ const mysql = require('mysql2');
 const cors = require('cors');
 const bcrypt = require('bcrypt'); // Para segurança das senhas
 const jwt = require('jsonwebtoken'); // Para geração de tokens
+const multer = require('multer'); // IMPORT CORRIGIDO
+const path = require('path'); // IMPORT CORRIGIDO
+const fs = require('fs'); // Importado para garantir a criação da pasta de fotos
 require('dotenv').config();
 
 const app = express();
@@ -20,10 +23,17 @@ const db = mysql.createPool({
     queueLimit: 0
 });
 
-// Configuração do Multer (Declarado apenas UMA vez)
+// Configuração Segura do Multer
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, path.join(__dirname, '../meu-projeto-react/src/assets/photos')); // ajusta o nome da pasta do frontend se necessário
+    // Monta o caminho absoluto para evitar erros de diretório do Node
+    const targetPath = path.resolve(__dirname, '..', 'meu-projeto-react', 'src', 'assets', 'photos');
+    
+    // Se a pasta não existir por algum motivo, cria ela de forma síncrona
+    if (!fs.existsSync(targetPath)) {
+        fs.mkdirSync(targetPath, { recursive: true });
+    }
+    cb(null, targetPath);
   },
   filename: (req, file, cb) => {
     const uniqueName = Date.now() + '-' + Math.round(Math.random() * 1e9);
@@ -44,8 +54,9 @@ app.post('/pets', upload.fields([
     description, personality, contact, fk_user
   } = req.body;
 
-  const profile_photo = req.files['profile_photo']?.[0]?.filename || null;
-  const others = req.files['others_photos_videos'] || [];
+  const filesReceived = req.files || {};
+  const profile_photo = filesReceived['profile_photo']?.[0]?.filename || null;
+  const others = filesReceived['others_photos_videos'] || [];
   const others_photos_videos = others.map(f => f.filename).join(',') || null;
 
   const sql = `
@@ -84,12 +95,10 @@ app.get('/pets', (req, res) => {
             return res.status(500).json({ error: "Erro interno no servidor." });
         }
 
-        // Se o banco estiver vazio, devolve um array vazio [] com status 200 (sucesso)
         if (results.length === 0) {
             return res.json([]);
         }
 
-        // Devolve a lista (array) com todos os pets para o React
         res.json(results);
     });
 });
@@ -115,8 +124,7 @@ app.get('/pets/:id', (req, res) => {
 app.post('/signup', async (req, res) => {
     const { username, email, password, isAdotante, isDoador } = req.body;
 
-    // Lógica para definir o user_type baseado nos checkboxes do frontend
-    let user_type = 'Adotante'; // Default
+    let user_type = 'Adotante'; 
     if (isAdotante && isDoador) {
         user_type = 'Adotante e Doador';
     } else if (isDoador) {
@@ -126,9 +134,7 @@ app.post('/signup', async (req, res) => {
     }
 
     try {
-        // Criptografando a senha (requer varchar(255) no banco)
         const hashedPassword = await bcrypt.hash(password, 10);
-
         const sql = "INSERT INTO user (username, login, password, user_type) VALUES (?, ?, ?, ?)";
         
         db.query(sql, [username, email, hashedPassword, user_type], (err, result) => {
@@ -149,7 +155,6 @@ app.post('/signup', async (req, res) => {
 // --- ROTA DE LOGIN ---
 app.post('/login', (req, res) => {
     const { email, password } = req.body;
-
     const sql = "SELECT * FROM user WHERE login = ?";
     
     db.query(sql, [email], async (err, results) => {
@@ -160,16 +165,14 @@ app.post('/login', (req, res) => {
         }
 
         const user = results[0];
-
-        // Compara a senha digitada com o hash do banco
         const match = await bcrypt.compare(password, user.password);
 
         if (match) {
-            // Gera o token JWT
+            // Gera o token JWT baseado no login efetuado com sucesso
             const token = jwt.sign(
                 { id: user.id_user, username: user.username, type: user.user_type },
                 process.env.JWT_SECRET || 'fallback_secret_key_123',
-                { expiresIn: '1h' } // Token expira em 1 hora
+                { expiresIn: '1h' }
             );
 
             res.json({ 
@@ -187,89 +190,43 @@ app.post('/login', (req, res) => {
     });
 });
 
-// Rota para detalhes do pet (já existente)
-app.get('/pets/:id', (req, res) => {
-    const { id } = req.params; 
-    const sql = `
-        SELECT p.*, u.username AS nome_dono
-        FROM pet p
-        INNER JOIN user u ON p.fk_user = u.id_user
-        WHERE p.id_pet = ?
-    `; 
-
-    db.query(sql, [id], (err, results) => {
-        if (err) return res.status(500).json({ error: "Erro interno." });
-        if (results.length === 0) return res.status(404).json({ error: "Pet não encontrado." });
-        res.json(results[0]);
-    });
-});
-
-// ROTA PARA PEGAR TODOS OS PETS CADASTRADOS
-app.get('/pets', (req, res) => {
-    const sql = `
-        SELECT p.*, u.username AS nome_dono
-        FROM pet p
-        INNER JOIN user u ON p.fk_user = u.id_user
-    `; 
-
-    db.query(sql, (err, results) => {
-        if (err) {
-            console.error('Erro ao buscar todos os pets:', err.message);
-            return res.status(500).json({ error: "Erro interno no servidor." });
-        }
-
-        // Se o banco estiver vazio, devolve um array vazio [] com status 200 (sucesso)
-        if (results.length === 0) {
-            return res.json([]);
-        }
-
-        // Devolve a lista (array) com todos os pets para o React
-        res.json(results);
-    });
-});
-
 // --- MIDDLEWARE DE AUTENTICAÇÃO JWT ---
 const verifyToken = (req, res, next) => {
     const authHeader = req.headers['authorization'];
     if (!authHeader) return res.status(401).json({ error: "Acesso negado. Token não fornecido." });
 
-    // O token geralmente vem no formato "Bearer MEU_TOKEN"
     const token = authHeader.split(' ')[1];
     if (!token) return res.status(401).json({ error: "Acesso negado. Token mal formatado." });
 
     try {
         const verified = jwt.verify(token, process.env.JWT_SECRET || 'fallback_secret_key_123');
-        req.user = verified; // Adiciona as informações do usuário logado na requisição
-        next(); // Permite que a rota continue executando
+        req.user = verified; 
+        next(); 
     } catch (err) {
         res.status(403).json({ error: "Token inválido ou expirado." });
     }
 };
 
-// ROTA PARA ADICIONAR OU REMOVER DOS FAVORITOS (Protegida)
+// --- ROTA PARA ADICIONAR OU REMOVER DOS FAVORITOS (Protegida) ---
 app.post('/favoritos/toggle', verifyToken, (req, res) => {
-// --- ROTA PARA ADICIONAR OU REMOVER DOS FAVORITOS ---
     const { id_user, id_pet } = req.body;
 
     if (!id_user || !id_pet) {
         return res.status(400).json({ error: "Usuário e Pet são obrigatórios." });
     }
 
-    // Primeiro, verifica se a relação já existe na tabela 'minha_casinha'
     const checkSql = "SELECT * FROM minha_casinha WHERE fk_user_id = ? AND fk_pet_id = ?";
     
     db.query(checkSql, [id_user, id_pet], (err, results) => {
         if (err) return res.status(500).json({ error: "Erro ao verificar favoritos." });
 
         if (results.length > 0) {
-            // Se já existe, o usuário quer DESFAVORITAR (Deletar a relação)
             const deleteSql = "DELETE FROM minha_casinha WHERE fk_user_id = ? AND fk_pet_id = ?";
             db.query(deleteSql, [id_user, id_pet], (err) => {
                 if (err) return res.status(500).json({ error: "Erro ao remover dos favoritos." });
                 return res.json({ isFavorited: false, message: "Removido da minha casinha!" });
             });
         } else {
-            // Se não existe, o usuário quer FAVORITAR (Inserir a relação)
             const insertSql = "INSERT INTO minha_casinha (fk_user_id, fk_pet_id) VALUES (?, ?)";
             db.query(insertSql, [id_user, id_pet], (err) => {
                 if (err) return res.status(500).json({ error: "Erro ao adicionar aos favoritos." });
@@ -279,7 +236,7 @@ app.post('/favoritos/toggle', verifyToken, (req, res) => {
     });
 });
 
-//ROTA PARA VERIFICAR SE UM PET ESPECÍFICO JÁ É FAVORITO DO USUÁRIO (Protegida)
+// --- ROTA PARA VERIFICAR SE UM PET ESPECÍFICO JÁ É FAVORITO DO USUÁRIO (Protegida) ---
 app.get('/favoritos/check', verifyToken, (req, res) => {
     const { id_user, id_pet } = req.query;
 
@@ -290,7 +247,7 @@ app.get('/favoritos/check', verifyToken, (req, res) => {
     });
 });
 
-//ROTA PARA LISTAR TODOS OS PETS FAVORITOS DE UM USUÁRIO (Protegida)
+// --- ROTA PARA LISTAR TODOS OS PETS FAVORITOS DE UM USUÁRIO (Protegida) ---
 app.get('/favoritos/:id_user', verifyToken, (req, res) => {
     const { id_user } = req.params;
     
@@ -315,7 +272,6 @@ app.get('/favoritos/:id_user', verifyToken, (req, res) => {
     });
 });
 
-// Alterado o nome da variavel para evitar que o .env force a porta 3306 do MySQL
 const BACKEND_PORT = 3001;
 app.listen(BACKEND_PORT, () => {
     console.log(`Servidor backend rodando na porta ${BACKEND_PORT}`);
