@@ -1,11 +1,7 @@
 .filters-container {
   background-color: #F8A6B4;
   width: 300px;
-  /* Garante que ele ocupe a altura disponível do layout pai, sem forçar 100vh da tela toda */
-  min-height: max-content;
-  /* Se o pai for um container flex, isso impede que ele estique até o chão sem necessidade */
-  align-self: flex-start; 
-  height: auto;
+  min-height: calc(100vh - 160px);
   padding: 32px 20px;
   border-radius: 30px;
   box-sizing: border-box;
@@ -16,6 +12,7 @@
   margin-top: 20px;
   box-shadow: 0 8px 24px rgba(248, 166, 180, 0.3);
 }
+
 .filters-title {
   font-family: 'SN Pro', sans-serif;
   font-size: 32px;
