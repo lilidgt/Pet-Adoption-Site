@@ -6,7 +6,7 @@ import Footer from "../../components/Footer/Footer";
 import "./PetsParaAdocao.css";
 
 const PetsParaAdocao = ({
-  onCardClick,
+  onCardClick, // Esta função será responsável por levar o ID para a tela de detalhes
   onNavigate,
   onFavoritesClick,
   onRegisterPetClick,
@@ -44,16 +44,14 @@ const PetsParaAdocao = ({
   const filteredPets = pets.filter((petItem) => {
     // 1. Filtro de Estado (compara siglas/nomes ignorando case e espaços)
     if (activeFilters.state && petItem.state) {
-      // Como o IBGE traz a sigla (ex: PR) ou nome, adaptamos para bater com o banco
       const filterState = activeFilters.state.toLowerCase().trim();
       const petState = petItem.state.toLowerCase().trim();
-      // Verifica se a sigla bate ou se o pet tem o nome completo parecido
       if (petState !== filterState && !petState.includes(filterState)) return false;
     }
 
     // 2. Filtro de Cidade
     if (activeFilters.city && petItem.city) {
-      if (petItem.city.toLowerCase().trim() !== activeFilters.city.toLowerCase().trim()) return false;
+      if (!petItem.city.toLowerCase().trim().includes(activeFilters.city.toLowerCase().trim())) return false;
     }
 
     // 3. Filtro de Espécie
@@ -101,11 +99,14 @@ const PetsParaAdocao = ({
       />
 
       <main className="pets-adocao-layout">
-        {/* Passamos a função para capturar as mudanças de filtro aqui */}
         <Filters onFilterChange={(filters) => setActiveFilters(filters)} />
 
         <div className="pets-adocao-content">
           <div className="pets-grid">
+            {error && <p className="error-message">Erro: {error}</p>}
+            
+            {loading && <p>Carregando os pets...</p>}
+
             {!loading && filteredPets.length === 0 && (
               <p>Nenhum pet corresponde aos filtros selecionados.</p>
             )}
@@ -115,6 +116,7 @@ const PetsParaAdocao = ({
                 <PetCard
                   key={petItem.id_pet}
                   pet={petItem}
+                  // Ao clicar, executa a prop onCardClick enviando o ID real do banco
                   onClick={() => onCardClick && onCardClick(petItem.id_pet)}
                 />
               ))}

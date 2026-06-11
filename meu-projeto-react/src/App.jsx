@@ -14,7 +14,7 @@ function App() {
 
   // 2. Ajustamos a função para receber o ID do pet que foi clicado
   const goToDetails = (id) => {
-    setSelectedPetId(1); // Guarda o ID (ex: 1) no estado
+    setSelectedPetId(id); // Agora ele salva dinamicamente o ID correto!
     setCurrentPage("details"); // Muda para a tela de detalhes
   };
 
