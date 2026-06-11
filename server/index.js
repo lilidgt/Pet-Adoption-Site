@@ -249,7 +249,6 @@ const verifyToken = (req, res, next) => {
 // ROTA PARA ADICIONAR OU REMOVER DOS FAVORITOS (Protegida)
 app.post('/favoritos/toggle', verifyToken, (req, res) => {
 // --- ROTA PARA ADICIONAR OU REMOVER DOS FAVORITOS ---
-app.post('/favoritos/toggle', (req, res) => {
     const { id_user, id_pet } = req.body;
 
     if (!id_user || !id_pet) {
