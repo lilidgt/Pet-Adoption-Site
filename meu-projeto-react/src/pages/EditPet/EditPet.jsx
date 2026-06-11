@@ -82,7 +82,7 @@ const AttachCard = ({ label, accept, icon, onFileSelect }) => {
   );
 };
 
-// CORREÇÃO 1: miniatura da foto/video simplificada e sem erro de useEffect
+// miniatura da foto/video
 const ThumbSlot = ({ isEmpty, preview, onChange }) => {
   const inputRef = useRef(null);
 
@@ -116,7 +116,6 @@ const ThumbSlot = ({ isEmpty, preview, onChange }) => {
 };
 
 //pagina principal de edição do pet
-// CORREÇÃO 2: onBackClick removido dos parâmetros para evitar o erro de 'unused-vars'
 const EditPet = ({
   petId,
   onNavigate,
@@ -141,7 +140,6 @@ const EditPet = ({
   const [toast, setToast] = useState(null);
   const mainPhotoRef = useRef(null);
 
-  // CORREÇÃO 3: showToast movido para CIMA do useEffect para ele conseguir enxergá-la
   const showToast = (msg) => {
     setToast(msg);
     setTimeout(() => setToast(null), 3000);
@@ -150,9 +148,15 @@ const EditPet = ({
   // Função auxiliar para arrumar a URL da imagem vinda do banco
   const getImageUrl = (imagePath) => {
     if (!imagePath) return null;
-    if (imagePath.startsWith("http") || imagePath.startsWith("data:")) {
+    // Se for uma foto que o usuário acabou de subir no input (blob) ou um link externo (http), retorna direto
+    if (
+      imagePath.startsWith("blob:") ||
+      imagePath.startsWith("http") ||
+      imagePath.startsWith("data:")
+    ) {
       return imagePath;
     }
+    // Senão, é um caminho relativo do banco. Aponta para o servidor backend.
     const separator = imagePath.startsWith("/") ? "" : "/";
     return `http://localhost:3001${separator}${imagePath}`;
   };
@@ -196,10 +200,12 @@ const EditPet = ({
           );
         }
 
+        // Recupera foto principal corrigida com a URL do backend
         if (data.profile_photo) {
           setMainPhoto(getImageUrl(data.profile_photo));
         }
 
+        // Recupera as miniaturas corrigidas com a URL do backend
         if (data.others_photos_videos) {
           const adicionais = data.others_photos_videos
             .split(",")
