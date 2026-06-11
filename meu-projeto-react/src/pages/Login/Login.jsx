@@ -21,8 +21,9 @@ const Login = ({ onLogin, onSignUpClick }) => {
       const data = await response.json();
 
       if (response.ok) {
-        // Armazena os dados básicos do usuário no localStorage para saber quem está logado
+        // Armazena os dados básicos do usuário e o token no localStorage
         localStorage.setItem('user', JSON.stringify(data.user));
+        if (data.token) localStorage.setItem('token', data.token);
 
         alert(`Bem-vindo de volta, ${data.user.username}!`);
         onLogin(); // Chama a função que muda para a tela principal
