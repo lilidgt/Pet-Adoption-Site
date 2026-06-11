@@ -11,55 +11,6 @@ const CameraIcon = () => (
   </svg>
 );
 
-// Ícone de arquivo (documentos)
-const FileIcon = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="18" height="18">
-    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-    <polyline points="14 2 14 8 20 8" />
-  </svg>
-);
-
-// Ícone de imagem
-const ImageIcon = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="18" height="18">
-    <rect x="3" y="3" width="18" height="18" rx="2" />
-    <circle cx="8.5" cy="8.5" r="1.5" />
-    <polyline points="21 15 16 10 5 21" />
-  </svg>
-);
-
-//card de anexo
-const AttachCard = ({ label, accept, icon, onFileSelect }) => {
-  const [fileName, setFileName] = useState(null);
-  const inputRef = useRef(null);
-
-  const handleChange = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    const name = file.name.length > 16 ? file.name.slice(0, 14) + "…" : file.name;
-    setFileName(name);
-    if (onFileSelect) onFileSelect(file);
-  };
-
-  return (
-    <div
-      className={`attach-card ${fileName ? "attach-card--filled" : ""}`}
-      onClick={() => inputRef.current.click()}
-    >
-      <span className="attach-card__label">{label}</span>
-      <div className="attach-card__icon">{icon}</div>
-      {fileName && <span className="attach-card__filename">{fileName}</span>}
-      <input
-        ref={inputRef}
-        type="file"
-        accept={accept}
-        onChange={handleChange}
-        style={{ display: "none" }}
-      />
-    </div>
-  );
-};
-
 // miniatura da foto/video
 const ThumbSlot = ({ isEmpty, preview: previewProp, onChange }) => {
   const [preview, setPreview] = useState(previewProp || null);
@@ -115,6 +66,9 @@ const RegisterPet = ({ onNavigate, onFavoritesClick, onRegisterPetClick, onLogin
     personalidade: "",
   });
   const [personalityTags, setPersonalityTags] = useState([]);
+  const [statesList, setStatesList] = useState([]);
+  const [citiesList, setCitiesList] = useState([]);
+  const [loadingCities, setLoadingCities] = useState(false);
   const [mainPhoto, setMainPhoto] = useState(null);
   const [mediaPreviews, setMediaPreviews] = useState([null, null, null]);
   const [toast, setToast] = useState(null);
@@ -125,6 +79,35 @@ const RegisterPet = ({ onNavigate, onFavoritesClick, onRegisterPetClick, onLogin
   const handleField = (e) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
+
+  const handleStateChange = (e) => {
+    const value = e.target.value;
+    setForm((prev) => ({ ...prev, estado: value, cidade: "" }));
+  };
+
+  useEffect(() => {
+    fetch('https://servicodados.ibge.gov.br/api/v1/localidades/estados?orderBy=nome')
+      .then((res) => res.json())
+      .then((data) => setStatesList(data))
+      .catch((err) => console.error('Erro ao carregar estados IBGE:', err));
+  }, []);
+
+  useEffect(() => {
+    if (!form.estado) {
+      setCitiesList([]);
+      return;
+    }
+
+    setLoadingCities(true);
+    fetch(`https://servicodados.ibge.gov.br/api/v1/localidades/estados/${form.estado}/municipios?orderBy=nome`)
+      .then((res) => res.json())
+      .then((data) => setCitiesList(data))
+      .catch((err) => {
+        console.error('Erro ao carregar cidades IBGE:', err);
+        setCitiesList([]);
+      })
+      .finally(() => setLoadingCities(false));
+  }, [form.estado]);
 
   const addPersonalityTag = () => {
     const tag = form.personalidade.trim();
@@ -176,7 +159,10 @@ const RegisterPet = ({ onNavigate, onFavoritesClick, onRegisterPetClick, onLogin
     data.append('castrated', form.castrado);
     data.append('description', form.descricao);
     data.append('personality', personalityTags.join(','));
-    data.append('contact', form.contato);
+
+    const contatoNumeros = form.contato.trim().replace(/\D/g, '');
+    const contatoFormatado = contatoNumeros ? (contatoNumeros.startsWith('55') ? contatoNumeros : `55${contatoNumeros}`) : '';
+    data.append('contact', contatoFormatado);
     data.append('fk_user', 1);
 
     // foto principal (você precisa guardar o File, não só a URL)
@@ -202,24 +188,6 @@ const handleMediaAttach = (file, idx) => {
   setMediaFiles(prev => { const c = [...prev]; c[idx] = file; return c; }); // guarda o File
   setMediaPreviews(prev => { const c = [...prev]; c[idx] = URL.createObjectURL(file); return c; });
 };
-
-  const DOC_LABELS = [
-    "Carteirinha de vacinação",
-    "Carteirinha de vacinação",
-    "Carteirinha de vacinação",
-    "Carteirinha de vacinação",
-    "Carteirinha de vacinação",
-    "Carteirinha de vacinação",
-  ];
-
-  const MEDIA_LABELS = [
-    "Adicionar foto",
-    "Adicionar foto",
-    "Adicionar foto",
-    "Adicionar foto",
-    "Adicionar foto",
-    "Adicionar foto",
-  ];
 
   return (
     <div className="cadastre-container">
@@ -438,16 +406,31 @@ const handleMediaAttach = (file, idx) => {
                 </div>
 
                 <div className="field-group">
-                <label htmlFor="cidade">Cidade</label>
-                <input
-                  id="cidade"
-                  name="cidade"
-                  type="text"
-                  className="field-input"
-                  value={form.cidade}
-                  onChange={handleField}
-                />
-              </div>
+                  <label htmlFor="cidade">Cidade</label>
+                  <input
+                    id="cidade"
+                    name="cidade"
+                    type="text"
+                    className="field-input"
+                    value={form.cidade}
+                    onChange={handleField}
+                    list="cidade-list"
+                    placeholder={
+                      loadingCities
+                        ? "Carregando cidades..."
+                        : form.estado
+                        ? "Selecione ou digite a cidade"
+                        : "Selecione o estado primeiro"
+                    }
+                    disabled={!form.estado || loadingCities}
+                    autoComplete="off"
+                  />
+                  <datalist id="cidade-list">
+                    {citiesList.map((city) => (
+                      <option key={city.id} value={city.nome} />
+                    ))}
+                  </datalist>
+                </div>
               </div>
             </div>
 
@@ -456,14 +439,20 @@ const handleMediaAttach = (file, idx) => {
 
               <div className="field-group">
                 <label htmlFor="estado">Estado</label>
-                <input
+                <select
                   id="estado"
                   name="estado"
-                  type="text"
                   className="field-input"
                   value={form.estado}
-                  onChange={handleField}
-                />
+                  onChange={handleStateChange}
+                >
+                  <option value="">Selecione</option>
+                  {statesList.map((state) => (
+                    <option key={state.id} value={state.sigla}>
+                      {state.nome}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               <div className="field-group">
@@ -474,42 +463,10 @@ const handleMediaAttach = (file, idx) => {
                   type="tel"
                   inputMode="tel"
                   className="field-input"
-                  placeholder="Número para contato"
+                  placeholder="WhatsApp com DDD"
                   value={form.contato}
                   onChange={handleField}
                 />
-              </div>
-            </div>
-
-            {/* seções de anexo */}
-            <div className="attach-sections">
-              <div className="attach-section attach-section--documents">
-                <h3 className="attach-section__title">Anexo de documentos</h3>
-                <div className="attach-grid">
-                  {DOC_LABELS.map((label, i) => (
-                    <AttachCard
-                      key={`doc-${i}`}
-                      label={label}
-                      accept=".pdf,.jpg,.jpeg,.png"
-                      icon={<FileIcon />}
-                    />
-                  ))}
-                </div>
-              </div>
-
-              <div className="attach-section attach-section--media">
-                <h3 className="attach-section__title">Adicionar +foto/vídeo</h3>
-                <div className="attach-grid">
-                  {MEDIA_LABELS.map((label, i) => (
-                    <AttachCard
-                      key={`media-${i}`}
-                      label={label}
-                      accept="image/*,video/*"
-                      icon={<ImageIcon />}
-                      onFileSelect={(file) => handleMediaAttach(file, i)}
-                    />
-                  ))}
-                </div>
               </div>
             </div>
 
