@@ -169,7 +169,11 @@ const RegisterPet = ({ onNavigate, onFavoritesClick, onRegisterPetClick, onLogin
     const contatoNumeros = form.contato.trim().replace(/\D/g, '');
     const contatoFormatado = contatoNumeros ? (contatoNumeros.startsWith('55') ? contatoNumeros : `55${contatoNumeros}`) : '';
     data.append('contact', contatoFormatado);
-    data.append('fk_user', 1);
+    
+    // Recupera o usuário logado do localStorage para pegar o ID correto
+    const loggedUser = JSON.parse(localStorage.getItem('user'));
+    const userId = loggedUser ? loggedUser.id : 1; // Fallback para 1 se não encontrar, mas idealmente deve estar logado
+    data.append('fk_user', userId);
 
     // foto principal
     if (mainPhotoFile) data.append('profile_photo', mainPhotoFile);
