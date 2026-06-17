@@ -76,6 +76,25 @@
   border-style: solid;
   border-color: #F8A6B4;
 }
+
+/* destaque de erro para área da foto */
+.main-photo--error {
+  border-color: rgba(255, 70, 70, 0.6);
+  box-shadow: 0 0 0 4px rgba(255, 70, 70, 0.08);
+}
+
+/* destaque visual ao arrastar arquivos sobre a área */
+.main-photo--dragging {
+  border-color: #F8A6B4;
+  box-shadow: 0 0 0 6px rgba(248,166,180,0.06);
+  transform: scale(1.01);
+}
+
+.thumb-slot--dragging {
+  border-color: #F8A6B4;
+  transform: scale(1.05);
+  background-color: #fff8ef;
+}
 .main-photo__img {
   width: 100%;
   height: 100%;
@@ -166,6 +185,41 @@
   justify-content: center;
 }
 
+.thumb-slot__remove {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  background: rgba(0,0,0,0.5);
+  color: #fff;
+  border: none;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.main-photo__remove {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(0,0,0,0.5);
+  color: #fff;
+  border: none;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  font-size: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.thumb-slot, .main-photo { position: relative; }
+
 /*coluna da direita*/
 .cadastre-form {
   display: flex;
@@ -194,43 +248,58 @@
 }
 
 /* descrição ocupa altura total na linha porte+desc */
-.field-group--desc {
-  grid-row: span 1;
-}
-.field-group {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-.field-group label {
-  font-family: 'Gluten', cursive;
-  font-size: 16px;
-  font-weight: 700;
-  color: #532D2D;
-  text-align: left;
-}
-
-/* Inputs e textarea */
-.field-input {
-  background-color: #F8E1BF;
-  border: none;
-  border-radius: 16px;
-  padding: 12px 16px;
-  font-family: 'SN Pro', sans-serif;
-  font-size: 15px;
-  color: #532D2D;
-  outline: none;
-  width: 100%;
-  box-sizing: border-box;
-  transition: box-shadow 0.2s, background-color 0.2s;
-}
-.field-input::placeholder {
-  color: rgba(83, 45, 45, 0.45);
-}
 .field-input:focus {
   box-shadow: 0 0 0 2.5px #F8A6B4;
   background-color: #fff8ef;
 }
+
+/* estado de erro para inputs */
+.field-input--error {
+  box-shadow: 0 0 0 2px rgba(255, 70, 70, 0.12);
+  background-color: #fff6f6;
+  border: 1px solid rgba(255, 70, 70, 0.25);
+}
+
+.field-error-message {
+  color: #b23a3a;
+  font-size: 13px;
+  margin-top: 6px;
+  font-family: 'SN Pro', sans-serif;
+  font-weight: 700;
+}
+
+.field-input:focus {
+  box-shadow: 0 0 0 2.5px #F8A6B4;
+  background-color: #fff8ef;
+}
+
+/* estado de erro para inputs */
+.field-input--error {
+  box-shadow: 0 0 0 2px rgba(255, 70, 70, 0.12);
+  background-color: #fff6f6;
+  border: 1px solid rgba(255, 70, 70, 0.25);
+}
+
+.field-error-message {
+  color: #b23a3a;
+  font-size: 13px;
+  margin-top: 6px;
+  font-family: 'SN Pro', sans-serif;
+  font-weight: 700;
+}
+
+/* botão para preencher com dados de exemplo */
+.btn-sample {
+  background-color: #f0f0f0;
+  color: #532d2d;
+  border: 1px solid rgba(83,45,45,0.08);
+  border-radius: 32px;
+  padding: 12px 20px;
+  font-family: 'SN Pro', sans-serif;
+  font-weight: 700;
+  cursor: pointer;
+}
+.btn-sample:hover { background-color: #ececec; }
 
 .field-input--textarea {
   resize: none;
