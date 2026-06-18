@@ -99,6 +99,15 @@ const EditPet = ({
     fetch(`http://localhost:3001/pets/${petId}`)
       .then((res) => res.json())
       .then((data) => {
+        // Validação de segurança no front-end: 
+        // Se o usuário logado não for o dono, redireciona ou avisa.
+        const loggedUser = JSON.parse(localStorage.getItem("user")) || null;
+        if (!loggedUser || data.fk_user !== loggedUser.id) {
+          alert("Você não tem permissão para editar este pet.");
+          onNavigate(petId); // Volta para os detalhes
+          return;
+        }
+
         setForm({
           nome: data.name || "",
           especie: data.species || "",
@@ -260,10 +269,19 @@ const EditPet = ({
     });
 
     try {
+      const token = localStorage.getItem("token");
       const response = await fetch(`http://localhost:3001/pets/${petId}`, {
         method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
         body: data,
       });
+
+      if (response.status === 403) {
+        showToast("Você não tem permissão para editar este pet.");
+        return;
+      }
 
       if (!response.ok) {
         throw new Error("Resposta inválida do servidor");

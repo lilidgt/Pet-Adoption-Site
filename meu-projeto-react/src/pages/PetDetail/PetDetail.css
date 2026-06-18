@@ -103,12 +103,14 @@
   padding: 32px;
   box-sizing: border-box;
   border: 2px solid #532d2d;
+  min-width: 0; /* Impede que o conteúdo interno force o container a vazar */
 }
 
 .pet-action-buttons {
   display: flex;
   gap: 16px;
   margin-bottom: 20px;
+  flex-wrap: wrap; /* Permite que os botões quebrem a linha se não houver espaço */
 }
 
 .btn-favorite-action,
@@ -272,7 +274,7 @@
 .responsible-info {
   display: flex;
   width: fit-content;
-  min-width: 200px;
+  max-width: 100%; /* Garante que não vaze do container pai */
   justify-content: flex-start;
   align-items: center;
   gap: 12px;

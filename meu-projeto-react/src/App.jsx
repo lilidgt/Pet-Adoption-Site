@@ -9,13 +9,13 @@ import EditPet from "./pages/EditPet/EditPet";
 import "./App.css";
 
 function App() {
-  const [currentPage, setCurrentPage] = useState("login");
-  const [selectedPetId, setSelectedPetId] = useState(null);
-
-  // 1. [MUDANÇA] Adicionado o estado para controlar se está logado
-  const [isLoggedIn, setIsLoggedIn] = useState(() => {
-    return localStorage.getItem('user') !== null;
+  // ALTERAÇÃO: Verifica se já existe um token salvo para definir a página inicial
+  const [currentPage, setCurrentPage] = useState(() => {
+    const token = localStorage.getItem("token");
+    return token ? "list" : "login";
   });
+
+  const [selectedPetId, setSelectedPetId] = useState(null);
 
   // 2. [MUDANÇA] Função para quando o login der certo
   const handleLoginSuccess = () => {
@@ -32,9 +32,34 @@ function App() {
   };
 
   const goToDetails = (id) => {
-    setSelectedPetId(id);
-    setCurrentPage("details");
+    setSelectedPetId(id); 
+    setCurrentPage("details"); 
   };
+
+  const [isLoggedIn, setIsLoggedIn] = useState(() => {
+  const user = localStorage.getItem('user');
+  const loginTimestamp = localStorage.getItem('loginTimestamp');
+
+  if (!user || !loginTimestamp) {
+    return false;
+  }
+
+  // Define o tempo limite (24 horas em milissegundos)
+  // 24 horas * 60 minutos * 60 segundos * 1000 milissegundos
+  const TEMPO_LIMITE = 24 * 60 * 60 * 1000; 
+  const agora = Date.now();
+  const tempoDecorrido = agora - Number(loginTimestamp);
+
+  // Se o tempo passou do limite, limpa o lixo do localStorage e retorna falso
+  if (tempoDecorrido > TEMPO_LIMITE) {
+    localStorage.removeItem('user');
+    localStorage.removeItem('token');
+    localStorage.removeItem('loginTimestamp');
+    return false;
+  }
+
+  return true;
+});
 
   const goToEdit = (id) => {
     setSelectedPetId(id);
@@ -46,6 +71,9 @@ function App() {
   };
 
   const goToLogin = () => {
+    // ALTERAÇÃO: Ao ir para a tela de login (Logout), limpamos os dados salvos
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
     setCurrentPage("login");
   };
 
@@ -72,7 +100,7 @@ function App() {
       )}
       {currentPage === "list" && (
         <PetsParaAdocao
-          onCardClick={goToDetails}
+          onCardClick={goToDetails} 
           onNavigate={goToList}
           onLoginClick={goToLogin}
           onFavoritesClick={goToFavorites}
@@ -84,7 +112,7 @@ function App() {
       )}
       {currentPage === "details" && (
         <PetDetail
-          petId={selectedPetId}
+          petId={selectedPetId} 
           onBackClick={goToList}
           onNavigate={goToList}
           onLoginClick={goToLogin}
@@ -122,7 +150,7 @@ function App() {
       {currentPage === "edit" && (
         <EditPet
           petId={selectedPetId}
-          onNavigate={goToDetails}
+          onNavigate={goToDetails} 
           onFavoritesClick={goToFavorites}
           onLoginClick={goToLogin}
           onRegisterPetClick={goToRegisterPet}
