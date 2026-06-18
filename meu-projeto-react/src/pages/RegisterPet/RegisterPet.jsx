@@ -12,12 +12,28 @@ const CameraIcon = () => (
 );
 
 // miniatura da foto/video
-const ThumbSlot = ({ isEmpty, preview: previewProp, onChange }) => {
+const ThumbSlot = ({ isEmpty, preview: previewProp, onChange, onRemove }) => {
   const [preview, setPreview] = useState(previewProp || null);
+  const [isDragging, setIsDragging] = useState(false);
   const inputRef = useRef(null);
 
   const handleChange = (e) => {
     const file = e.target.files[0];
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    setPreview(url);
+    if (onChange) onChange(file);
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+  };
+  const handleDragEnter = (e) => { e.preventDefault(); setIsDragging(true); };
+  const handleDragLeave = (e) => { e.preventDefault(); setIsDragging(false); };
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const file = e.dataTransfer.files && e.dataTransfer.files[0];
     if (!file) return;
     const url = URL.createObjectURL(file);
     setPreview(url);
@@ -30,11 +46,24 @@ const ThumbSlot = ({ isEmpty, preview: previewProp, onChange }) => {
 
   return (
     <div
-      className={`thumb-slot ${preview ? "thumb-slot--filled" : ""}`}
+      className={`thumb-slot ${preview ? "thumb-slot--filled" : ""} ${isDragging ? 'thumb-slot--dragging' : ''}`}
       onClick={() => inputRef.current.click()}
+      onDragOver={handleDragOver}
+      onDragEnter={handleDragEnter}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
     >
       {preview ? (
-        <img src={preview} alt="Miniatura" className="thumb-slot__img" />
+        <>
+          <img src={preview} alt="Miniatura" className="thumb-slot__img" />
+          <button
+            type="button"
+            className="thumb-slot__remove"
+            onClick={(ev) => { ev.stopPropagation(); setPreview(null); if (onRemove) onRemove(); }}
+          >
+            ×
+          </button>
+        </>
       ) : (
         <span className="thumb-slot__plus">{isEmpty ? <CameraIcon /> : "+"}</span>
       )}
@@ -75,7 +104,9 @@ const RegisterPet = ({ onNavigate, onFavoritesClick, onRegisterPetClick, onLogin
   const [toast, setToast] = useState(null);
   const mainPhotoRef = useRef(null);
   const [mainPhotoFile, setMainPhotoFile] = useState(null);
+  const [mainDragging, setMainDragging] = useState(false);
   const [mediaFiles, setMediaFiles] = useState([null, null, null]);
+  const [errors, setErrors] = useState({});
 
   const handleField = (e) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -135,6 +166,21 @@ const RegisterPet = ({ onNavigate, onFavoritesClick, onRegisterPetClick, onLogin
     if (!file) return;
     setMainPhotoFile(file);                        // guarda o File
     setMainPhoto(URL.createObjectURL(file));        // guarda a URL só pro preview
+    // limpa possível erro de foto
+    setErrors(prev => { const c = { ...prev }; delete c.foto; return c; });
+  };
+
+  const handleMainPhotoDragOver = (e) => { e.preventDefault(); };
+  const handleMainPhotoDragEnter = (e) => { e.preventDefault(); setMainDragging(true); };
+  const handleMainPhotoDragLeave = (e) => { e.preventDefault(); setMainDragging(false); };
+  const handleMainPhotoDrop = (e) => {
+    e.preventDefault();
+    setMainDragging(false);
+    const file = e.dataTransfer.files && e.dataTransfer.files[0];
+    if (!file) return;
+    setMainPhotoFile(file);
+    setMainPhoto(URL.createObjectURL(file));
+    setErrors(prev => { const c = { ...prev }; delete c.foto; return c; });
   };
 
   const showToast = (msg) => {
@@ -142,12 +188,45 @@ const RegisterPet = ({ onNavigate, onFavoritesClick, onRegisterPetClick, onLogin
     setTimeout(() => setToast(null), 3000);
   };
 
+  const validateForm = () => {
+    const newErrors = {};
+
+    if (!form.nome.trim()) newErrors.nome = 'Nome é obrigatório.';
+    if (!form.especie) newErrors.especie = 'Espécie é obrigatória.';
+    if (!form.porte) newErrors.porte = 'Porte é obrigatório.';
+    if (form.idade === '' || form.idade === null) newErrors.idade = 'Idade é obrigatória.';
+    if (!form.genero) newErrors.genero = 'Gênero é obrigatório.';
+    if (!form.descricao.trim()) newErrors.descricao = 'Descrição é obrigatória.';
+    if (!form.vacinacao) newErrors.vacinacao = 'Informe a vacinação.';
+    if (!form.castrado) newErrors.castrado = 'Informe se é castrado.';
+    if (!form.estado) newErrors.estado = 'Estado é obrigatório.';
+    if (!form.cidade.trim()) newErrors.cidade = 'Cidade é obrigatória.';
+    // personalidade: exige pelo menos uma tag adicionada
+    if (!personalityTags || personalityTags.length === 0) newErrors.personalidade = 'Adicione pelo menos uma personalidade.';
+    const contatoNumeros = form.contato.trim().replace(/\D/g, '');
+    if (!contatoNumeros) newErrors.contato = 'Contato é obrigatório.';
+
+    // foto: exige pelo menos uma foto (principal ou outras)
+    const hasAnyPhoto = !!mainPhotoFile || mediaFiles.some(f => !!f);
+    if (!hasAnyPhoto) newErrors.foto = 'Adicione pelo menos uma foto do pet.';
+
+    setErrors(newErrors);
+
+    if (Object.keys(newErrors).length > 0) {
+      const firstKey = Object.keys(newErrors)[0];
+      const el = document.getElementById(firstKey);
+      if (el && typeof el.focus === 'function') el.focus();
+      showToast('⚠️ Por favor, preencha os campos obrigatórios.');
+      return false;
+    }
+    return true;
+  };
+
+  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!form.nome.trim()) { 
-      showToast("⚠️ Por favor, insira o nome do pet."); 
-      return; 
-    }
+    if (!validateForm()) return;
 
     setIsSubmitting(true);
 
@@ -209,6 +288,15 @@ const RegisterPet = ({ onNavigate, onFavoritesClick, onRegisterPetClick, onLogin
     if (!file) return;
     setMediaFiles(prev => { const c = [...prev]; c[idx] = file; return c; }); // guarda o File
     setMediaPreviews(prev => { const c = [...prev]; c[idx] = URL.createObjectURL(file); return c; });
+    // limpa possível erro de foto
+    setErrors(prev => { const c = { ...prev }; delete c.foto; return c; });
+  };
+
+  const handleMediaRemove = (idx) => {
+    setMediaFiles(prev => { const c = [...prev]; c[idx] = null; return c; });
+    setMediaPreviews(prev => { const c = [...prev]; c[idx] = null; return c; });
+    // limpa possível erro de foto
+    setErrors(prev => { const c = { ...prev }; delete c.foto; return c; });
   };
 
   return (
@@ -233,11 +321,24 @@ const RegisterPet = ({ onNavigate, onFavoritesClick, onRegisterPetClick, onLogin
 
             {/* Foto principal */}
             <div
-              className={`main-photo ${mainPhoto ? "main-photo--filled" : ""}`}
+              className={`main-photo ${mainPhoto ? "main-photo--filled" : ""} ${mainDragging ? 'main-photo--dragging' : ''} ${errors.foto ? 'main-photo--error' : ''}`}
               onClick={() => mainPhotoRef.current.click()}
+              onDragOver={handleMainPhotoDragOver}
+              onDragEnter={handleMainPhotoDragEnter}
+              onDragLeave={handleMainPhotoDragLeave}
+              onDrop={handleMainPhotoDrop}
             >
               {mainPhoto ? (
-                <img src={mainPhoto} alt="Foto principal do pet" className="main-photo__img" />
+                <>
+                  <img src={mainPhoto} alt="Foto principal do pet" className="main-photo__img" />
+                  <button
+                    type="button"
+                    className="main-photo__remove"
+                    onClick={(ev) => { ev.stopPropagation(); setMainPhoto(null); setMainPhotoFile(null); setErrors(prev => { const c = { ...prev }; delete c.foto; return c; }); }}
+                  >
+                    ×
+                  </button>
+                </>
               ) : (
                 <div className="main-photo__hint">
                   <CameraIcon />
@@ -246,6 +347,7 @@ const RegisterPet = ({ onNavigate, onFavoritesClick, onRegisterPetClick, onLogin
               )}
               <input
                 ref={mainPhotoRef}
+                id="main-photo-input"
                 type="file"
                 accept="image/*"
                 onChange={handleMainPhoto}
@@ -260,6 +362,7 @@ const RegisterPet = ({ onNavigate, onFavoritesClick, onRegisterPetClick, onLogin
                   key={i}
                   preview={mediaPreviews && mediaPreviews[i]}
                   onChange={(file) => handleMediaAttach(file, i)}
+                  onRemove={() => handleMediaRemove(i)}
                   isEmpty={i === 2}
                 />
               ))}
@@ -279,6 +382,7 @@ const RegisterPet = ({ onNavigate, onFavoritesClick, onRegisterPetClick, onLogin
                 ))}
               </div>
             )}
+            {errors.foto && <div className="field-error-message">{errors.foto}</div>}
           </aside>
 
           {/* formulario de cadastro pet */}
@@ -292,18 +396,19 @@ const RegisterPet = ({ onNavigate, onFavoritesClick, onRegisterPetClick, onLogin
                   id="nome"
                   name="nome"
                   type="text"
-                  className="field-input"
+                  className={`field-input ${errors.nome ? 'field-input--error' : ''}`}
                   placeholder="Insira o nome do pet"
                   value={form.nome}
                   onChange={handleField}
                 />
+                {errors.nome && <div className="field-error-message">{errors.nome}</div>}
               </div>
               <div className="field-group">
                 <label htmlFor="especie">Espécie</label>
                 <select
                   id="especie"
                   name="especie"
-                  className="field-input"
+                  className={`field-input ${errors.especie ? 'field-input--error' : ''}`}
                   value={form.especie}
                   onChange={handleField}
                 >
@@ -312,6 +417,7 @@ const RegisterPet = ({ onNavigate, onFavoritesClick, onRegisterPetClick, onLogin
                   <option value="Gato">Gato</option>
                   <option value="Roedor">Roedor</option>
                 </select>
+                {errors.especie && <div className="field-error-message">{errors.especie}</div>}
               </div>
             </div>
 
@@ -322,7 +428,7 @@ const RegisterPet = ({ onNavigate, onFavoritesClick, onRegisterPetClick, onLogin
                 <select
                   id="porte"
                   name="porte"
-                  className="field-input"
+                  className={`field-input ${errors.porte ? 'field-input--error' : ''}`}
                   value={form.porte}
                   onChange={handleField}
                 >
@@ -331,6 +437,7 @@ const RegisterPet = ({ onNavigate, onFavoritesClick, onRegisterPetClick, onLogin
                   <option value="Médio">Médio</option>
                   <option value="Grande">Grande</option>
                 </select>
+                {errors.porte && <div className="field-error-message">{errors.porte}</div>}
               </div>
 
               <div className="field-group">
@@ -340,11 +447,12 @@ const RegisterPet = ({ onNavigate, onFavoritesClick, onRegisterPetClick, onLogin
                   name="idade"
                   type="number"
                   min="0"
-                  className="field-input"
+                  className={`field-input ${errors.idade ? 'field-input--error' : ''}`}
                   placeholder="Insira a idade do pet"
                   value={form.idade}
                   onChange={handleField}
                 />
+                {errors.idade && <div className="field-error-message">{errors.idade}</div>}
               </div>
             </div>
 
@@ -354,7 +462,7 @@ const RegisterPet = ({ onNavigate, onFavoritesClick, onRegisterPetClick, onLogin
                 <select
                   id="genero"
                   name="genero"
-                  className="field-input"
+                  className={`field-input ${errors.genero ? 'field-input--error' : ''}`}
                   value={form.genero}
                   onChange={handleField}
                 >
@@ -362,6 +470,7 @@ const RegisterPet = ({ onNavigate, onFavoritesClick, onRegisterPetClick, onLogin
                   <option value="Fêmea">Fêmea</option>
                   <option value="Macho">Macho</option>
                 </select>
+                {errors.genero && <div className="field-error-message">{errors.genero}</div>}
               </div>
 
               <div className="field-group">
@@ -370,12 +479,13 @@ const RegisterPet = ({ onNavigate, onFavoritesClick, onRegisterPetClick, onLogin
                   id="personalidade"
                   name="personalidade"
                   type="text"
-                  className="field-input"
+                  className={`field-input ${errors.personalidade ? 'field-input--error' : ''}`}
                   placeholder="Digite e pressione Enter"
                   value={form.personalidade}
                   onChange={handleField}
                   onKeyDown={handlePersonalityKeyDown}
                 />
+                {errors.personalidade && <div className="field-error-message">{errors.personalidade}</div>}
               </div>
             </div>
 
@@ -386,11 +496,12 @@ const RegisterPet = ({ onNavigate, onFavoritesClick, onRegisterPetClick, onLogin
                 <textarea
                   id="descricao"
                   name="descricao"
-                  className="field-input field-input--textarea"
+                  className={`field-input field-input--textarea ${errors.descricao ? 'field-input--error' : ''}`}
                   placeholder="Conte um pouco sobre a história do seu pet"
                   value={form.descricao}
                   onChange={handleField}
                 />
+                {errors.descricao && <div className="field-error-message">{errors.descricao}</div>}
               </div>
 
               {/* Coluna Direita: Vacinação, Castrado e Cidade */}
@@ -400,7 +511,7 @@ const RegisterPet = ({ onNavigate, onFavoritesClick, onRegisterPetClick, onLogin
                   <select
                     id="vacinacao"
                     name="vacinacao"
-                    className="field-input"
+                    className={`field-input ${errors.vacinacao ? 'field-input--error' : ''}`}
                     value={form.vacinacao}
                     onChange={handleField}
                   >
@@ -409,6 +520,7 @@ const RegisterPet = ({ onNavigate, onFavoritesClick, onRegisterPetClick, onLogin
                     <option value="Incompleto">Incompleto</option>
                     <option value="Não vacinado">Não vacinado</option>
                   </select>
+                  {errors.vacinacao && <div className="field-error-message">{errors.vacinacao}</div>}
                 </div>
 
                 <div className="field-group">
@@ -416,7 +528,7 @@ const RegisterPet = ({ onNavigate, onFavoritesClick, onRegisterPetClick, onLogin
                   <select
                     id="castrado"
                     name="castrado"
-                    className="field-input"
+                    className={`field-input ${errors.castrado ? 'field-input--error' : ''}`}
                     value={form.castrado}
                     onChange={handleField}
                   >
@@ -424,6 +536,7 @@ const RegisterPet = ({ onNavigate, onFavoritesClick, onRegisterPetClick, onLogin
                     <option value="Sim">Sim</option>
                     <option value="Não">Não</option>
                   </select>
+                  {errors.castrado && <div className="field-error-message">{errors.castrado}</div>}
                 </div>
 
                 <div className="field-group">
@@ -432,7 +545,7 @@ const RegisterPet = ({ onNavigate, onFavoritesClick, onRegisterPetClick, onLogin
                     id="cidade"
                     name="cidade"
                     type="text"
-                    className="field-input"
+                    className={`field-input ${errors.cidade ? 'field-input--error' : ''}`}
                     value={form.cidade}
                     onChange={handleField}
                     list="cidade-list"
@@ -446,6 +559,7 @@ const RegisterPet = ({ onNavigate, onFavoritesClick, onRegisterPetClick, onLogin
                     disabled={!form.estado || loadingCities}
                     autoComplete="off"
                   />
+                  {errors.cidade && <div className="field-error-message">{errors.cidade}</div>}
                   <datalist id="cidade-list">
                     {citiesList.map((city) => (
                       <option key={city.id} value={city.nome} />
@@ -462,7 +576,7 @@ const RegisterPet = ({ onNavigate, onFavoritesClick, onRegisterPetClick, onLogin
                 <select
                   id="estado"
                   name="estado"
-                  className="field-input"
+                  className={`field-input ${errors.estado ? 'field-input--error' : ''}`}
                   value={form.estado}
                   onChange={handleStateChange}
                 >
@@ -473,6 +587,7 @@ const RegisterPet = ({ onNavigate, onFavoritesClick, onRegisterPetClick, onLogin
                     </option>
                   ))}
                 </select>
+                {errors.estado && <div className="field-error-message">{errors.estado}</div>}
               </div>
 
               <div className="field-group">
@@ -482,11 +597,12 @@ const RegisterPet = ({ onNavigate, onFavoritesClick, onRegisterPetClick, onLogin
                   name="contato"
                   type="tel"
                   inputMode="tel"
-                  className="field-input"
+                  className={`field-input ${errors.contato ? 'field-input--error' : ''}`}
                   placeholder="WhatsApp com DDD"
                   value={form.contato}
                   onChange={handleField}
                 />
+                {errors.contato && <div className="field-error-message">{errors.contato}</div>}
               </div>
             </div>
 
