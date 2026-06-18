@@ -283,10 +283,10 @@ app.post('/login', (req, res) => {
         if (match) {
             // Gera o token JWT baseado no login efetuado com sucesso
             const token = jwt.sign(
-                { id: user.id_user, username: user.username, type: user.user_type },
-                process.env.JWT_SECRET || 'fallback_secret_key_123',
-                { expiresIn: '1h' }
-            );
+            { id: user.id_user, username: user.username, type: user.user_type },
+            process.env.JWT_SECRET || 'fallback_secret_key_123',
+            { expiresIn: '7d' } // <--- MUDE DE '1h' PARA '7d'
+        );
 
             res.json({ 
                 message: "Login realizado!", 
@@ -303,12 +303,14 @@ app.post('/login', (req, res) => {
     });
 });
 
-// --- ROTA PARA ADICIONAR OU REMOVER DOS FAVORITOS (Protegida) ---
+// --- ROTA PARA ADICIONAR OU REMOVER DOS FAVORITOS (Corrigida) ---
+// --- ROTA PARA ADICIONAR OU REMOVER DOS FAVORITOS (Sincronizada) ---
 app.post('/favoritos/toggle', verifyToken, (req, res) => {
-    const { id_user, id_pet } = req.body;
+    const id_user = req.user.id; // Lê do token gerado no login
+    const { id_pet } = req.body; // Remove o id_user daqui
 
-    if (!id_user || !id_pet) {
-        return res.status(400).json({ error: "Usuário e Pet são obrigatórios." });
+    if (!id_pet) {
+        return res.status(400).json({ error: "O ID do Pet é obrigatório." });
     }
 
     const checkSql = "SELECT * FROM minha_casinha WHERE fk_user_id = ? AND fk_pet_id = ?";
@@ -332,9 +334,10 @@ app.post('/favoritos/toggle', verifyToken, (req, res) => {
     });
 });
 
-// --- ROTA PARA VERIFICAR SE UM PET ESPECÍFICO JÁ É FAVORITO DO USUÁRIO (Protegida) ---
+// --- ROTA PARA VERIFICAR SE JÁ É FAVORITO (Sincronizada) ---
 app.get('/favoritos/check', verifyToken, (req, res) => {
-    const { id_user, id_pet } = req.query;
+    const id_user = req.user.id; // Garante a consistência lendo do token
+    const { id_pet } = req.query;
 
     const sql = "SELECT * FROM minha_casinha WHERE fk_user_id = ? AND fk_pet_id = ?";
     db.query(sql, [id_user, id_pet], (err, results) => {
