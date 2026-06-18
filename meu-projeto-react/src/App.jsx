@@ -9,14 +9,17 @@ import EditPet from "./pages/EditPet/EditPet";
 import "./App.css";
 
 function App() {
-  const [currentPage, setCurrentPage] = useState("login");
-  // 1. Criamos um estado para guardar o ID do pet selecionado
+  // ALTERAÇÃO: Verifica se já existe um token salvo para definir a página inicial
+  const [currentPage, setCurrentPage] = useState(() => {
+    const token = localStorage.getItem("token");
+    return token ? "list" : "login";
+  });
+
   const [selectedPetId, setSelectedPetId] = useState(null);
 
-  // 2. Ajustamos a função para receber o ID do pet que foi clicado
   const goToDetails = (id) => {
-    setSelectedPetId(id); // Agora ele salva dinamicamente o ID correto!
-    setCurrentPage("details"); // Muda para a tela de detalhes
+    setSelectedPetId(id); 
+    setCurrentPage("details"); 
   };
 
   const [isLoggedIn, setIsLoggedIn] = useState(() => {
@@ -54,6 +57,9 @@ function App() {
   };
 
   const goToLogin = () => {
+    // ALTERAÇÃO: Ao ir para a tela de login (Logout), limpamos os dados salvos
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
     setCurrentPage("login");
   };
 
@@ -63,7 +69,7 @@ function App() {
 
   const goToFavorites = () => {
     setCurrentPage("favorites");
-    };
+  };
 
   const goToRegisterPet = () => {
     setCurrentPage("register");
@@ -79,7 +85,7 @@ function App() {
       )}
       {currentPage === "list" && (
         <PetsParaAdocao
-          onCardClick={goToDetails} // Agora essa função captura o ID enviado pelo card
+          onCardClick={goToDetails} 
           onNavigate={goToList}
           onLoginClick={goToLogin}
           onFavoritesClick={goToFavorites}
@@ -88,7 +94,7 @@ function App() {
       )}
       {currentPage === "details" && (
         <PetDetail
-          petId={selectedPetId} // 3. PASSAMOS O ID SALVO PARA O COMPONENTE DETALHES!
+          petId={selectedPetId} 
           onBackClick={goToList}
           onNavigate={goToList}
           onLoginClick={goToLogin}
@@ -117,7 +123,7 @@ function App() {
       {currentPage === "edit" && (
         <EditPet
           petId={selectedPetId}
-          onNavigate={goToDetails} // Após editar, volta para os detalhes do pet
+          onNavigate={goToDetails} 
           onFavoritesClick={goToFavorites}
           onLoginClick={goToLogin}
           onRegisterPetClick={goToRegisterPet}
