@@ -158,7 +158,6 @@ app.put('/pets/:id', verifyToken, upload.fields([
   });
 });
 
-// --- ROTA PARA PEGAR TODOS OS PETS CADASTRADOS (Com INNER JOIN) ---
 app.get('/pets', (req, res) => {
     const sql = `
         SELECT p.*, u.username AS nome_dono
@@ -180,7 +179,6 @@ app.get('/pets', (req, res) => {
     });
 });
 
-// --- ROTA DE DETALHES DE UM PET ESPECÍFICO ---
 app.get('/pets/:id', (req, res) => {
   const { id } = req.params;
   const sql = `
@@ -197,7 +195,6 @@ app.get('/pets/:id', (req, res) => {
   });
 });
 
-// --- ROTA: EXCLUIR PET (Protegida) ---
 app.delete('/pets/:id', verifyToken, (req, res) => {
   const { id } = req.params;
   const userId = req.user.id;
@@ -233,7 +230,6 @@ app.delete('/pets/:id', verifyToken, (req, res) => {
   });
 });
 
-// --- ROTA DE SIGN UP (CADASTRO DE USUÁRIO) ---
 app.post('/signup', async (req, res) => {
     const { username, email, password, isAdotante, isDoador } = req.body;
 
@@ -265,7 +261,6 @@ app.post('/signup', async (req, res) => {
     }
 });
 
-// --- ROTA DE LOGIN ---
 app.post('/login', (req, res) => {
     const { email, password } = req.body;
     const sql = "SELECT * FROM user WHERE login = ?";
@@ -303,11 +298,10 @@ app.post('/login', (req, res) => {
     });
 });
 
-// --- ROTA PARA ADICIONAR OU REMOVER DOS FAVORITOS (Corrigida) ---
-// --- ROTA PARA ADICIONAR OU REMOVER DOS FAVORITOS (Sincronizada) ---
+
 app.post('/favoritos/toggle', verifyToken, (req, res) => {
-    const id_user = req.user.id; // Lê do token gerado no login
-    const { id_pet } = req.body; // Remove o id_user daqui
+    const id_user = req.user.id;
+    const { id_pet } = req.body;
 
     if (!id_pet) {
         return res.status(400).json({ error: "O ID do Pet é obrigatório." });
@@ -334,9 +328,8 @@ app.post('/favoritos/toggle', verifyToken, (req, res) => {
     });
 });
 
-// --- ROTA PARA VERIFICAR SE JÁ É FAVORITO (Sincronizada) ---
 app.get('/favoritos/check', verifyToken, (req, res) => {
-    const id_user = req.user.id; // Garante a consistência lendo do token
+    const id_user = req.user.id;
     const { id_pet } = req.query;
 
     const sql = "SELECT * FROM minha_casinha WHERE fk_user_id = ? AND fk_pet_id = ?";
@@ -346,7 +339,6 @@ app.get('/favoritos/check', verifyToken, (req, res) => {
     });
 });
 
-// --- ROTA PARA LISTAR TODOS OS PETS FAVORITOS DE UM USUÁRIO (Protegida) ---
 app.get('/favoritos/:id_user', verifyToken, (req, res) => {
     const { id_user } = req.params;
     
@@ -371,7 +363,6 @@ app.get('/favoritos/:id_user', verifyToken, (req, res) => {
     });
 });
 
-// --- INICIALIZAÇÃO DO SERVIDOR ---
 const BACKEND_PORT = 3001;
 app.listen(BACKEND_PORT, () => {
     console.log(`Servidor backend rodando na porta ${BACKEND_PORT}`);

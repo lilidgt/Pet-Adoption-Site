@@ -279,7 +279,7 @@ const RegisterPet = ({
 
     } catch (error) {
       console.error("Erro ao conectar ou processar requisição:", error);
-      showToast("❌ Não foi possível conectar ao servidor. Certifique-se de que o back-end está rodando.");
+      showToast("Não foi possível conectar ao servidor. Certifique-se de que o back-end está rodando.");
     } finally {
       setIsSubmitting(false);
     }

@@ -106,10 +106,8 @@ const PetDetail = ({
           alert(data.message);
         }
       })
-      // Busque a função handleFavoriteClick no seu PetDetail.jsx e mude o final do .catch:
       .catch((err) => {
         console.error("Erro ao alternar favorito:", err);
-        // ALTERAÇÃO DE DIAGNÓSTICO: Mostra o erro exato em vez da frase genérica
         alert(`Erro real capturado: ${err.message}`);
       });
   };

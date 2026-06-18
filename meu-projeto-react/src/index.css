@@ -32,7 +32,7 @@
   --text-h: #532D2D;
   --bg: #fff;
   --border: #e5e4e7;
-  --brand-pink: #F8A6B4; /* adicionei essa variável da cor rosa usada para poder ser referenciada em outros css como var(brand-pínk) */
+  --brand-pink: #F8A6B4;
   --sans: 'SN Pro', system-ui, sans-serif;
   
   font: 18px/145% var(--sans);

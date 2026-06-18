@@ -5,8 +5,8 @@ import loginButton from "../../assets/login_button.svg";
 import logOut from "../../assets/LogoutButton.svg";
 
 const Header = ({
-  isLoggedIn,      // 🌟 RECEBE SE ESTÁ LOGADO
-  onLogoutClick,   // 🌟 RECEBE A FUNÇÃO DE LOGOUT
+  isLoggedIn,
+  onLogoutClick,
   onNavigate,
   onFavoritesClick,
   onLoginClick,
