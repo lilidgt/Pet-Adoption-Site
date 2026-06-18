@@ -18,15 +18,13 @@
 }
 
 .pets-adocao-content {
-  flex-grow: 1;
+  flex: 1 1 auto;
   display: flex;
   flex-direction: column;
   padding: 20px;
   box-sizing: border-box;
   min-width: 0;
 
-  /* SOLUÇÃO RESPONSIVA: */
-  /* O limite será 940px, mas se a tela for menor, vira 80% da altura da tela (ajuste o % se necessário) */
   max-height: min(940px, 100vh); 
   
   overflow: auto;
@@ -63,8 +61,5 @@
     padding: 0 16px; 
   }
 
-  .pets-adocao-content {
-    max-height: none;
-    overflow-y: visible;
-  }
+  /* No special overrides needed for small screens; content will flow naturally */
 }
