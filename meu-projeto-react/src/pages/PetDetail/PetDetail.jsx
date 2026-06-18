@@ -35,6 +35,7 @@ const PetDetail = ({
   useEffect(() => {
     setLoading(true);
 
+    // 1. Busca os detalhes do pet
     fetch(`http://localhost:3001/pets/${petId}`)
       .then((response) => {
         if (!response.ok) {
@@ -52,20 +53,26 @@ const PetDetail = ({
         setLoading(false);
       });
 
+    // 2. Checa se o pet já está favoritado usando apenas o token
     if (userId) {
       const token = localStorage.getItem("token");
-      fetch(
-        `http://localhost:3001/favoritos/check?id_user=${userId}&id_pet=${petId}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      )
-        .then((res) => res.json())
-        .then((data) => setIsFavorited(data.isFavorited))
+      fetch(`http://localhost:3001/favoritos/check?id_pet=${petId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+        .then((res) => {
+          if (!res.ok) throw new Error("Erro na validação do token.");
+          return res.json();
+        })
+        .then((data) => {
+          if (data && typeof data.isFavorited !== "undefined") {
+            setIsFavorited(data.isFavorited);
+          }
+        })
         .catch((err) => console.error("Erro ao checar favorito:", err));
     }
   }, [petId, userId]);
 
+  // 3. Função disparada ao clicar no botão de favorito
   const handleFavoriteClick = () => {
     if (!userId) {
       alert("Você precisa estar logado para favoritar um pet!");
@@ -73,28 +80,44 @@ const PetDetail = ({
     }
 
     const token = localStorage.getItem("token");
+    
     fetch("http://localhost:3001/favoritos/toggle", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({ id_user: userId, id_pet: petId }),
+      body: JSON.stringify({ id_pet: petId }), // Enviando apenas o id_pet, o back-end resolve o usuário pelo token!
     })
-      .then((res) => res.json())
-      .then((data) => {
-        setIsFavorited(data.isFavorited);
-        alert(data.message);
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error("Erro de autenticação ou erro interno da API.");
+        }
+        return res.json();
       })
-      .catch((err) => console.error("Erro ao alternar favorito:", err));
+      .then((data) => {
+        const novoStatusFavorito = data && typeof data.isFavorited !== "undefined"
+          ? data.isFavorited
+          : !isFavorited;
+
+        setIsFavorited(novoStatusFavorito);
+        
+        if (data && data.message) {
+          alert(data.message);
+        }
+      })
+      // Busque a função handleFavoriteClick no seu PetDetail.jsx e mude o final do .catch:
+      .catch((err) => {
+        console.error("Erro ao alternar favorito:", err);
+        // ALTERAÇÃO DE DIAGNÓSTICO: Mostra o erro exato em vez da frase genérica
+        alert(`Erro real capturado: ${err.message}`);
+      });
   };
 
   const handleDeleteClick = () => {
     const token = localStorage.getItem("token");
 
-    if (
-      window.confirm(`Tem certeza que deseja excluir o anúncio do ${pet.name}?`)
-    ) {
+    if (window.confirm(`Tem certeza que deseja excluir o anúncio do ${pet.name}?`)) {
       fetch(`http://localhost:3001/pets/${petId}`, {
         method: "DELETE",
         headers: {
@@ -104,7 +127,7 @@ const PetDetail = ({
         .then((res) => {
           if (res.ok) {
             alert("Pet excluído com sucesso!");
-            onBackClick(); // Volta para a lista
+            onBackClick();
           } else if (res.status === 403) {
             alert("Você não tem permissão para excluir este pet.");
           } else {
@@ -115,12 +138,10 @@ const PetDetail = ({
     }
   };
 
-  if (loading)
-    return <div className="loading">Carregando detalhes do pet...</div>;
+  if (loading) return <div className="loading">Carregando detalhes do pet...</div>;
   if (error) return <div className="error">Erro: {error}</div>;
   if (!pet) return <div className="error">Nenhum pet encontrado.</div>;
 
-  // Verifica se o usuário logado é o dono do pet
   const isOwner = userId && pet && userId === pet.fk_user;
 
   return (
@@ -141,13 +162,9 @@ const PetDetail = ({
             Voltar
           </button>
 
-          {/* Só exibe ações administrativas (Editar/Excluir) se for o dono do pet */}
           {isOwner && (
             <div className="admin-actions">
-              <button
-                className="btn-edit-admin"
-                onClick={() => onEditClick(petId)}
-              >
+              <button className="btn-edit-admin" onClick={() => onEditClick(petId)}>
                 Editar
               </button>
               <button className="btn-delete-admin" onClick={handleDeleteClick}>
@@ -180,14 +197,9 @@ const PetDetail = ({
                       `Olá! Vi o anúncio do ${pet.name} no site de adoção e gostaria de saber mais informações.`,
                     );
 
-                    window.open(
-                      `https://wa.me/${numeroFormatado}?text=${mensagem}`,
-                      "_blank",
-                    );
+                    window.open(`https://wa.me/${numeroFormatado}?text=${mensagem}`, "_blank");
                   } else {
-                    alert(
-                      "Este responsável não cadastrou um número de contato.",
-                    );
+                    alert("Este responsável não cadastrou um número de contato.");
                   }
                 }}
               >
@@ -197,18 +209,11 @@ const PetDetail = ({
 
             {(() => {
               const listaFotos = [];
-
-              if (pet.profile_photo) {
-                listaFotos.push(pet.profile_photo);
-              }
-
+              if (pet.profile_photo) listaFotos.push(pet.profile_photo);
               if (pet.others_photos_videos) {
-                const adicionais = pet.others_photos_videos
-                  .split(",")
-                  .map((img) => img.trim());
+                const adicionais = pet.others_photos_videos.split(",").map((img) => img.trim());
                 listaFotos.push(...adicionais);
               }
-
               return <PetCarousel petPhotos={listaFotos} />;
             })()}
 
@@ -219,11 +224,7 @@ const PetDetail = ({
             <div className="info-card stats-card">
               <div className="stats-grid-display">
                 <div className="stat-display-item">
-                  <img
-                    src={calendarIcon}
-                    alt="Idade"
-                    className="stat-display-icon"
-                  />
+                  <img src={calendarIcon} alt="Idade" className="stat-display-icon" />
                   <div>
                     <p className="stat-display-label">Idade</p>
                     <p className="stat-display-value">
@@ -232,44 +233,28 @@ const PetDetail = ({
                   </div>
                 </div>
                 <div className="stat-display-item">
-                  <img
-                    src={vaccineIcon}
-                    alt="Vacinas"
-                    className="stat-display-icon"
-                  />
+                  <img src={vaccineIcon} alt="Vacinas" className="stat-display-icon" />
                   <div>
                     <p className="stat-display-label">Vacinas</p>
                     <p className="stat-display-value">{pet.vaccine}</p>
                   </div>
                 </div>
                 <div className="stat-display-item">
-                  <img
-                    src={genderIcon}
-                    alt="Sexo"
-                    className="stat-display-icon"
-                  />
+                  <img src={genderIcon} alt="Sexo" className="stat-display-icon" />
                   <div>
                     <p className="stat-display-label">Sexo</p>
                     <p className="stat-display-value">{pet.gender}</p>
                   </div>
                 </div>
                 <div className="stat-display-item">
-                  <img
-                    src={rulerIcon}
-                    alt="Porte"
-                    className="stat-display-icon"
-                  />
+                  <img src={rulerIcon} alt="Porte" className="stat-display-icon" />
                   <div>
                     <p className="stat-display-label">Porte</p>
                     <p className="stat-display-value">{pet.size}</p>
                   </div>
                 </div>
                 <div className="stat-display-item">
-                  <img
-                    src={footprintIcon}
-                    alt="Castrado"
-                    className="stat-display-icon"
-                  />
+                  <img src={footprintIcon} alt="Castrado" className="stat-display-icon" />
                   <div>
                     <p className="stat-display-label">Castrado</p>
                     <p className="stat-display-value">{pet.castrated}</p>
@@ -288,9 +273,7 @@ const PetDetail = ({
                       </span>
                     ))
                 ) : (
-                  <span className="pet-tag-item">
-                    Sem personalidade definida
-                  </span>
+                  <span className="pet-tag-item">Sem personalidade definida</span>
                 )}
               </div>
             </div>
@@ -299,11 +282,7 @@ const PetDetail = ({
               <h2>Sobre o {pet.name}</h2>
               <p>{pet.description}</p>
               <div className="responsible-info">
-                <img
-                  src={personIcon}
-                  alt="Responsável"
-                  className="contact-display-icon"
-                />
+                <img src={personIcon} alt="Responsável" className="contact-display-icon" />
                 <div>
                   <p className="contact-display-label">Responsável</p>
                   <p className="contact-display-value">{pet.nome_dono}</p>
