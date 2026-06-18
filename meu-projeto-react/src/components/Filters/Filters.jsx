@@ -70,6 +70,17 @@ const Filters = ({ onFilterChange }) => {
     );
   };
 
+  // 1. [NOVO] Função para resetar todos os inputs de filtros
+  const clearFilters = () => {
+    setSelectedStateSigla('');
+    setSelectedCityName('');
+    setSelectedSpecies('');
+    setIsCastrated(false);
+    setSelectedVaccine('');
+    setAge(15);
+    setSelectedTags([]);
+  };
+
   return (
     <aside className="filters-container">
       <h2 className="filters-title">Filtros</h2>
@@ -184,6 +195,16 @@ const Filters = ({ onFilterChange }) => {
           ))}
         </div>
       </div>
+
+      {/* 2. [NOVO] Botão de limpar filtros */}
+      <button 
+        type="button" 
+        className="clear-filters-button" 
+        onClick={clearFilters}
+      >
+        Limpar Filtros
+      </button>
+
     </aside>
   );
 };
