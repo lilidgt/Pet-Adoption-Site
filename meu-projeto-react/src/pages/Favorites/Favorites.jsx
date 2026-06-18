@@ -10,12 +10,13 @@ const Favorites = ({
   onFavoritesClick,
   onRegisterPetClick,
   onLoginClick,
+  isLoggedIn,
+  onLogoutClick,
 }) => {
   const [favoritePets, setFavoritePets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Recupera o ID do usuário logado do localStorage
   const loggedUser = JSON.parse(localStorage.getItem("user")) || null;
   const userId = loggedUser?.id;
 
@@ -28,7 +29,6 @@ const Favorites = ({
 
     const token = localStorage.getItem("token");
 
-    // Busca os pets favoritados do usuário atual
     fetch(`http://localhost:3001/favoritos/${userId}`, {
       headers: { "Authorization": `Bearer ${token}` }
     })
@@ -56,24 +56,22 @@ const Favorites = ({
         onFavoritesClick={onFavoritesClick}
         onRegisterPetClick={onRegisterPetClick}
         onLoginClick={onLoginClick}
+        isLoggedIn={isLoggedIn}
+        onLogoutClick={onLogoutClick}
       />
       <h1 className="page-name">Minha Casinha</h1>
       
       <main className="favorites-layout">
         <div className="favorites-content">
           <div className="pets-grid">
-            {/* 1. Tela de Carregamento */}
             {loading && <p>Carregando seus pets favoritos...</p>}
 
-            {/* 2. Tela de Erro ou falta de Login */}
             {error && <p className="error-message">{error}</p>}
 
-            {/* 3. Se não houver erro, terminou de carregar e a lista está vazia */}
             {!loading && !error && favoritePets.length === 0 && (
               <p>Sua casinha está vazia. Favorite alguns pets para vê-los aqui!</p>
             )}
 
-            {/* 4. Renderiza a lista de favoritos real vinda do banco */}
             {!loading && !error && favoritePets.length > 0 &&
               favoritePets.map((petItem) => (
                 <PetCard

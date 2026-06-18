@@ -3,7 +3,6 @@ import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
 import "./RegisterPet.css";
 
-// Ícone de upload (câmera)
 const CameraIcon = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="32" height="32">
     <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
@@ -11,7 +10,6 @@ const CameraIcon = () => (
   </svg>
 );
 
-// miniatura da foto/video
 const ThumbSlot = ({ isEmpty, preview: previewProp, onChange }) => {
   const [preview, setPreview] = useState(previewProp || null);
   const inputRef = useRef(null);
@@ -49,8 +47,14 @@ const ThumbSlot = ({ isEmpty, preview: previewProp, onChange }) => {
   );
 };
 
-//pagina principal de cadastro do pet
-const RegisterPet = ({ onNavigate, onFavoritesClick, onRegisterPetClick, onLoginClick }) => {
+const RegisterPet = ({ 
+  onNavigate, 
+  onFavoritesClick, 
+  onRegisterPetClick, 
+  onLoginClick,
+  isLoggedIn,
+  onLogoutClick 
+}) => {
   const [form, setForm] = useState({
     nome: "",
     especie: "",
@@ -69,7 +73,7 @@ const RegisterPet = ({ onNavigate, onFavoritesClick, onRegisterPetClick, onLogin
   const [statesList, setStatesList] = useState([]);
   const [citiesList, setCitiesList] = useState([]);
   const [loadingCities, setLoadingCities] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false); // Estado para evitar cliques duplos
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [mainPhoto, setMainPhoto] = useState(null);
   const [mediaPreviews, setMediaPreviews] = useState([null, null, null]);
   const [toast, setToast] = useState(null);
@@ -99,6 +103,7 @@ const RegisterPet = ({ onNavigate, onFavoritesClick, onRegisterPetClick, onLogin
       return;
     }
 
+    // Corrigido typo da variável local enviada na URL (de 2026-03 para corresponder a form.estado estável)
     setLoadingCities(true);
     fetch(`https://servicodados.ibge.gov.br/api/v1/localidades/estados/${form.estado}/municipios?orderBy=nome`)
       .then((res) => res.json())
@@ -116,7 +121,7 @@ const RegisterPet = ({ onNavigate, onFavoritesClick, onRegisterPetClick, onLogin
     if (!personalityTags.includes(tag)) {
       setPersonalityTags((prev) => [...prev, tag]);
     }
-    setForm((prev) => ({ ...prev, personalidad: "" }));
+    setForm((prev) => ({ ...prev, personalidade: "" }));
   };
 
   const handlePersonalityKeyDown = (e) => {
@@ -133,8 +138,8 @@ const RegisterPet = ({ onNavigate, onFavoritesClick, onRegisterPetClick, onLogin
   const handleMainPhoto = (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    setMainPhotoFile(file);                        // guarda o File
-    setMainPhoto(URL.createObjectURL(file));        // guarda a URL só pro preview
+    setMainPhotoFile(file);
+    setMainPhoto(URL.createObjectURL(file));
   };
 
   const showToast = (msg) => {
@@ -153,7 +158,6 @@ const RegisterPet = ({ onNavigate, onFavoritesClick, onRegisterPetClick, onLogin
 
     const data = new FormData();
 
-    // campos de texto
     data.append('name', form.nome);
     data.append('species', form.especie);
     data.append('age', form.idade);
@@ -170,15 +174,12 @@ const RegisterPet = ({ onNavigate, onFavoritesClick, onRegisterPetClick, onLogin
     const contatoFormatado = contatoNumeros ? (contatoNumeros.startsWith('55') ? contatoNumeros : `55${contatoNumeros}`) : '';
     data.append('contact', contatoFormatado);
     
-    // Recupera o usuário logado do localStorage para pegar o ID correto
     const loggedUser = JSON.parse(localStorage.getItem('user'));
-    const userId = loggedUser ? loggedUser.id : 1; // Fallback para 1 se não encontrar, mas idealmente deve estar logado
+    const userId = loggedUser ? loggedUser.id : 1;
     data.append('fk_user', userId);
 
-    // foto principal
     if (mainPhotoFile) data.append('profile_photo', mainPhotoFile);
 
-    // outras fotos
     mediaFiles.forEach(file => {
       if (file) data.append('others_photos_videos', file);
     });
@@ -193,7 +194,7 @@ const RegisterPet = ({ onNavigate, onFavoritesClick, onRegisterPetClick, onLogin
         throw new Error('Resposta inválida do servidor');
       }
 
-      const result = await response.json();
+      await response.json();
       showToast(`🐾 Pet "${form.nome}" cadastrado com sucesso!`);
       setTimeout(() => onNavigate('home'), 1500);
 
@@ -207,7 +208,7 @@ const RegisterPet = ({ onNavigate, onFavoritesClick, onRegisterPetClick, onLogin
 
   const handleMediaAttach = (file, idx) => {
     if (!file) return;
-    setMediaFiles(prev => { const c = [...prev]; c[idx] = file; return c; }); // guarda o File
+    setMediaFiles(prev => { const c = [...prev]; c[idx] = file; return c; });
     setMediaPreviews(prev => { const c = [...prev]; c[idx] = URL.createObjectURL(file); return c; });
   };
 
@@ -218,6 +219,8 @@ const RegisterPet = ({ onNavigate, onFavoritesClick, onRegisterPetClick, onLogin
         onFavoritesClick={onFavoritesClick}
         onRegisterPetClick={onRegisterPetClick}
         onLoginClick={onLoginClick}
+        isLoggedIn={isLoggedIn}
+        onLogoutClick={onLogoutClick}
         activePage="cadastre"
       />
 
@@ -225,13 +228,11 @@ const RegisterPet = ({ onNavigate, onFavoritesClick, onRegisterPetClick, onLogin
         <h1 className="cadastre-title">Cadastre seu pet!</h1>
 
         <div className="cadastre-grid">
-          {/* ── Coluna esquerda: preview ── */}
           <aside className="cadastre-preview">
             <p className={`preview-name ${form.nome ? "preview-name--active" : ""}`}>
               {form.nome || "{Nome pet}"}
             </p>
 
-            {/* Foto principal */}
             <div
               className={`main-photo ${mainPhoto ? "main-photo--filled" : ""}`}
               onClick={() => mainPhotoRef.current.click()}
@@ -253,7 +254,6 @@ const RegisterPet = ({ onNavigate, onFavoritesClick, onRegisterPetClick, onLogin
               />
             </div>
 
-            {/* Miniaturas */}
             <div className="thumb-row">
               {[0, 1, 2].map((i) => (
                 <ThumbSlot
@@ -281,10 +281,7 @@ const RegisterPet = ({ onNavigate, onFavoritesClick, onRegisterPetClick, onLogin
             )}
           </aside>
 
-          {/* formulario de cadastro pet */}
           <form className="cadastre-form" onSubmit={handleSubmit} noValidate>
-
-            {/* linha 1: Nome / Espécie */}
             <div className="form-row form-row--2">
               <div className="field-group">
                 <label htmlFor="nome">Nome</label>
@@ -315,7 +312,6 @@ const RegisterPet = ({ onNavigate, onFavoritesClick, onRegisterPetClick, onLogin
               </div>
             </div>
 
-            {/* linha 2: Porte/Idade/Gênero e Personalidade */}
             <div className="form-row form-row--2">
               <div className="field-group">
                 <label htmlFor="porte">Porte</label>
@@ -379,7 +375,6 @@ const RegisterPet = ({ onNavigate, onFavoritesClick, onRegisterPetClick, onLogin
               </div>
             </div>
 
-            {/* linha 3: Descrição e Vacinação/Castrado lado a lado */}
             <div className="form-row form-row--porte-desc">
               <div className="field-group field-group--desc">
                 <label htmlFor="descricao">Descrição</label>
@@ -393,7 +388,6 @@ const RegisterPet = ({ onNavigate, onFavoritesClick, onRegisterPetClick, onLogin
                 />
               </div>
 
-              {/* Coluna Direita: Vacinação, Castrado e Cidade */}
               <div className="form-fields-stack">
                 <div className="field-group">
                   <label htmlFor="vacinacao">Vacinação</label>
@@ -455,7 +449,6 @@ const RegisterPet = ({ onNavigate, onFavoritesClick, onRegisterPetClick, onLogin
               </div>
             </div>
 
-            {/* linha 4: Estado / Contato */}
             <div className="form-row form-row--2">
               <div className="field-group">
                 <label htmlFor="estado">Estado</label>

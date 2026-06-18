@@ -4,7 +4,6 @@ import Footer from "../../components/Footer/Footer";
 import PetCarousel from "../../components/PetCarousel/PetCarousel";
 import "./PetDetail.css";
 
-// importacao dos icones utilizados no componente
 import houseIcon from "../../assets/house.fill.svg";
 import calendarIcon from "../../assets/calendar icon.svg";
 import vaccineIcon from "../../assets/vaccine icon.svg";
@@ -12,7 +11,6 @@ import genderIcon from "../../assets/gender icon.svg";
 import rulerIcon from "../../assets/ruler icon.svg";
 import footprintIcon from "../../assets/footprint icon.svg";
 import personIcon from "../../assets/person icon.svg";
-import contactIcon from "../../assets/contact icon.png";
 import leftArrow from "../../assets/left arrow.svg";
 
 const PetDetail = ({
@@ -23,20 +21,20 @@ const PetDetail = ({
   onEditClick,
   onFavoritesClick,
   onRegisterPetClick,
+  isLoggedIn,
+  onLogoutClick,
 }) => {
   const [pet, setPet] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isFavorited, setIsFavorited] = useState(false);
 
-  // Recupera o usuário logado do localStorage para pegar o ID dele
   const loggedUser = JSON.parse(localStorage.getItem("user")) || null;
   const userId = loggedUser?.id;
 
   useEffect(() => {
     setLoading(true);
 
-    // 1. Busca os detalhes do pet baseado no petId recebido por propriedade
     fetch(`http://localhost:3001/pets/${petId}`)
       .then((response) => {
         if (!response.ok) {
@@ -54,7 +52,6 @@ const PetDetail = ({
         setLoading(false);
       });
 
-    // 2. Se o usuário estiver logado, checa se este pet já está favoritado (na minha casinha)
     if (userId) {
       const token = localStorage.getItem("token");
       fetch(
@@ -67,9 +64,8 @@ const PetDetail = ({
         .then((data) => setIsFavorited(data.isFavorited))
         .catch((err) => console.error("Erro ao checar favorito:", err));
     }
-  }, [petId, userId]); // Executa toda vez que o petId ou o usuário mudarem
+  }, [petId, userId]);
 
-  // 3. Função disparada ao clicar no botão de favorito (Liga / Desliga)
   const handleFavoriteClick = () => {
     if (!userId) {
       alert("Você precisa estar logado para favoritar um pet!");
@@ -93,7 +89,6 @@ const PetDetail = ({
       .catch((err) => console.error("Erro ao alternar favorito:", err));
   };
 
-  // Função para excluir o pet
   const handleDeleteClick = () => {
     if (
       window.confirm(`Tem certeza que deseja excluir o anúncio do ${pet.name}?`)
@@ -104,7 +99,7 @@ const PetDetail = ({
         .then((res) => {
           if (res.ok) {
             alert("Pet excluído com sucesso!");
-            onBackClick(); // Volta para a lista
+            onBackClick();
           } else {
             alert("Erro ao excluir pet.");
           }
@@ -113,7 +108,6 @@ const PetDetail = ({
     }
   };
 
-  // 4. Telas de transição (Carregando ou Erro)
   if (loading)
     return <div className="loading">Carregando detalhes do pet...</div>;
   if (error) return <div className="error">Erro: {error}</div>;
@@ -126,6 +120,8 @@ const PetDetail = ({
         onLoginClick={onLoginClick}
         onFavoritesClick={onFavoritesClick}
         onRegisterPetClick={onRegisterPetClick}
+        isLoggedIn={isLoggedIn}
+        onLogoutClick={onLogoutClick}
       />
 
       <main className="pet-detail-main">
@@ -147,10 +143,8 @@ const PetDetail = ({
           </div>
         </div>
         <div className="pet-detail-container">
-          {/* Coluna Esquerda: Ações, Carrossel e Nome */}
           <section className="pet-left-column">
             <div className="pet-action-buttons">
-              {/* Botão de Favorito Dinâmico adicionado aqui */}
               <button
                 className={`btn-favorite-action ${isFavorited ? "active" : ""}`}
                 onClick={handleFavoriteClick}
@@ -187,7 +181,6 @@ const PetDetail = ({
               </button>
             </div>
 
-            {/* JUNTANDO OS DOIS CAMPOS DE IMAGEM DO BANCO */}
             {(() => {
               const listaFotos = [];
 
@@ -208,9 +201,7 @@ const PetDetail = ({
             <h1 className="pet-display-name">{pet.name}</h1>
           </section>
 
-          {/* Coluna Direita: Cards de Informação */}
           <section className="pet-right-column">
-            {/* Card de Atributos */}
             <div className="info-card stats-card">
               <div className="stats-grid-display">
                 <div className="stat-display-item">
@@ -290,7 +281,6 @@ const PetDetail = ({
               </div>
             </div>
 
-            {/* Card Sobre */}
             <div className="info-card about-card">
               <h2>Sobre o {pet.name}</h2>
               <p>{pet.description}</p>
