@@ -3,10 +3,8 @@ import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
 import "./EditPet.css";
 
-// importacao do icone de voltar
 import leftArrow from "../../assets/left arrow.svg";
 
-// Ícone de upload (câmera)
 const CameraIcon = () => (
   <svg
     viewBox="0 0 24 24"
@@ -21,7 +19,6 @@ const CameraIcon = () => (
   </svg>
 );
 
-// miniatura da foto/video
 const ThumbSlot = ({ isEmpty, preview: previewProp, onChange }) => {
   const [preview, setPreview] = useState(previewProp || null);
   const inputRef = useRef(null);
@@ -61,13 +58,14 @@ const ThumbSlot = ({ isEmpty, preview: previewProp, onChange }) => {
   );
 };
 
-//pagina principal de edição do pet
 const EditPet = ({
   petId,
   onNavigate,
   onFavoritesClick,
   onRegisterPetClick,
   onLoginClick,
+  isLoggedIn,
+  onLogoutClick,
 }) => {
   const [form, setForm] = useState({
     nome: "",
@@ -95,7 +93,6 @@ const EditPet = ({
   const [mainPhotoFile, setMainPhotoFile] = useState(null);
   const [mediaFiles, setMediaFiles] = useState([null, null, null]);
 
-  // Carregar dados do pet para edição
   useEffect(() => {
     if (!petId) return;
 
@@ -206,7 +203,7 @@ const EditPet = ({
     if (!personalityTags.includes(tag)) {
       setPersonalityTags((prev) => [...prev, tag]);
     }
-    setForm((prev) => ({ ...prev, personalidade: "" }));
+    setForm((prev) => ({ ...prev, personalidad: "" }));
   };
 
   const handlePersonalityKeyDown = (e) => {
@@ -243,7 +240,6 @@ const EditPet = ({
 
     const data = new FormData();
 
-    // campos de texto
     data.append("name", form.nome);
     data.append("species", form.especie);
     data.append("age", form.idade);
@@ -264,15 +260,10 @@ const EditPet = ({
       : "";
     data.append("contact", contatoFormatado);
 
-    // Na edição, o fk_user já deve existir no banco, mas podemos mandar se necessário
-    // data.append('fk_user', 1);
-
-    // foto principal
     if (mainPhotoFile) {
       data.append("profile_photo", mainPhotoFile);
     }
 
-    // outras fotos
     mediaFiles.forEach((file) => {
       if (file) data.append("others_photos_videos", file);
     });
@@ -296,7 +287,7 @@ const EditPet = ({
         throw new Error("Resposta inválida do servidor");
       }
 
-      const result = await response.json();
+      await response.json();
       showToast(`Pet "${form.nome}" atualizado com sucesso!`);
       setTimeout(() => onNavigate(petId), 1500);
     } catch (error) {
@@ -330,6 +321,8 @@ const EditPet = ({
         onFavoritesClick={onFavoritesClick}
         onRegisterPetClick={onRegisterPetClick}
         onLoginClick={onLoginClick}
+        isLoggedIn={isLoggedIn}
+        onLogoutClick={onLogoutClick}
         activePage="edit-pet"
       />
 
@@ -343,7 +336,6 @@ const EditPet = ({
         <h1 className="edit-pet-title">Editar seu pet!</h1>
 
         <div className="edit-pet-grid">
-          {/* ── Coluna esquerda: preview ── */}
           <aside className="edit-pet-preview">
             <p
               className={`preview-name ${form.nome ? "preview-name--active" : ""}`}
@@ -351,7 +343,6 @@ const EditPet = ({
               {form.nome || "{Nome pet}"}
             </p>
 
-            {/* Foto principal */}
             <div
               className={`main-photo ${mainPhoto ? "main-photo--filled" : ""}`}
               onClick={() => mainPhotoRef.current.click()}
@@ -377,7 +368,6 @@ const EditPet = ({
               />
             </div>
 
-            {/* Miniaturas */}
             <div className="thumb-row">
               {[0, 1, 2].map((i) => (
                 <ThumbSlot
@@ -405,9 +395,7 @@ const EditPet = ({
             )}
           </aside>
 
-          {/* formulario de edição pet */}
           <form className="edit-pet-form" onSubmit={handleSubmit} noValidate>
-            {/* linha 1: Nome / Espécie */}
             <div className="form-row form-row--2">
               <div className="field-group">
                 <label htmlFor="nome">Nome</label>
@@ -438,7 +426,6 @@ const EditPet = ({
               </div>
             </div>
 
-            {/* linha 2: Porte/Idade/Gênero e Personalidade */}
             <div className="form-row form-row--2">
               <div className="field-group">
                 <label htmlFor="porte">Porte</label>
@@ -462,7 +449,6 @@ const EditPet = ({
                   id="idade"
                   name="idade"
                   type="number"
-                  min="0"
                   className="field-input"
                   placeholder="Insira a idade do pet"
                   value={form.idade}
@@ -502,7 +488,6 @@ const EditPet = ({
               </div>
             </div>
 
-            {/* linha 3: Descrição e Vacinação/Castrado lado a lado */}
             <div className="form-row form-row--porte-desc">
               <div className="field-group field-group--desc">
                 <label htmlFor="descricao">Descrição</label>
@@ -516,7 +501,6 @@ const EditPet = ({
                 />
               </div>
 
-              {/* Coluna Direita: Vacinação, Castrado e Cidade */}
               <div className="form-fields-stack">
                 <div className="field-group">
                   <label htmlFor="vacinacao">Vacinação</label>
@@ -578,7 +562,6 @@ const EditPet = ({
               </div>
             </div>
 
-            {/* linha 4: Estado / Contato */}
             <div className="form-row form-row--2">
               <div className="field-group">
                 <label htmlFor="estado">Estado</label>

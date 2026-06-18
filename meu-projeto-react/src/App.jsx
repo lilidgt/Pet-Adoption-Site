@@ -17,6 +17,20 @@ function App() {
 
   const [selectedPetId, setSelectedPetId] = useState(null);
 
+  // 2. [MUDANÇA] Função para quando o login der certo
+  const handleLoginSuccess = () => {
+    setIsLoggedIn(true);
+    setCurrentPage("list");
+  };
+
+  // 3. [MUDANÇA] Função para limpar os dados ao sair
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
+    setIsLoggedIn(false);
+    setCurrentPage("login");
+  };
+
   const goToDetails = (id) => {
     setSelectedPetId(id); 
     setCurrentPage("details"); 
@@ -77,8 +91,9 @@ function App() {
 
   return (
     <div className="App">
+      {/* 4. [MUDANÇA] Trocado goToList por handleLoginSuccess */}
       {currentPage === "login" && (
-        <Login onLogin={goToList} onSignUpClick={goToSignUp} />
+        <Login onLogin={handleLoginSuccess} onSignUpClick={goToSignUp} />
       )}
       {currentPage === "signup" && (
         <SignUp onSignUp={goToList} onLoginClick={goToLogin} />
@@ -90,6 +105,9 @@ function App() {
           onLoginClick={goToLogin}
           onFavoritesClick={goToFavorites}
           onRegisterPetClick={goToRegisterPet}
+          // 5. [MUDANÇA] Repassando as props de login para a página
+          isLoggedIn={isLoggedIn}
+          onLogoutClick={handleLogout}
         />
       )}
       {currentPage === "details" && (
@@ -101,6 +119,9 @@ function App() {
           onFavoritesClick={goToFavorites}
           onRegisterPetClick={goToRegisterPet}
           onEditClick={goToEdit}
+          // 5. [MUDANÇA] Repassando as props de login para a página
+          isLoggedIn={isLoggedIn}
+          onLogoutClick={handleLogout}
         />
       )}
       {currentPage === "favorites" && (
@@ -110,6 +131,9 @@ function App() {
           onFavoritesClick={goToFavorites}
           onLoginClick={goToLogin}
           onRegisterPetClick={goToRegisterPet}
+          // 5. [MUDANÇA] Repassando as props de login para a página
+          isLoggedIn={isLoggedIn}
+          onLogoutClick={handleLogout}
         />
       )}
       {currentPage === "register" && (
@@ -118,6 +142,9 @@ function App() {
           onFavoritesClick={goToFavorites}
           onLoginClick={goToLogin}
           onRegisterPetClick={goToRegisterPet}
+          // 5. [MUDANÇA] Repassando as props de login para a página
+          isLoggedIn={isLoggedIn}
+          onLogoutClick={handleLogout}
         />
       )}
       {currentPage === "edit" && (
@@ -127,6 +154,9 @@ function App() {
           onFavoritesClick={goToFavorites}
           onLoginClick={goToLogin}
           onRegisterPetClick={goToRegisterPet}
+          // 5. [MUDANÇA] Repassando as props de login para a página
+          isLoggedIn={isLoggedIn}
+          onLogoutClick={handleLogout}
         />
       )}
     </div>
