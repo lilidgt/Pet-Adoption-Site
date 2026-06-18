@@ -95,16 +95,23 @@ const PetDetail = ({
 
   // Função para excluir o pet
   const handleDeleteClick = () => {
+    const token = localStorage.getItem("token");
+
     if (
       window.confirm(`Tem certeza que deseja excluir o anúncio do ${pet.name}?`)
     ) {
       fetch(`http://localhost:3001/pets/${petId}`, {
         method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       })
         .then((res) => {
           if (res.ok) {
             alert("Pet excluído com sucesso!");
             onBackClick(); // Volta para a lista
+          } else if (res.status === 403) {
+            alert("Você não tem permissão para excluir este pet.");
           } else {
             alert("Erro ao excluir pet.");
           }
@@ -118,6 +125,9 @@ const PetDetail = ({
     return <div className="loading">Carregando detalhes do pet...</div>;
   if (error) return <div className="error">Erro: {error}</div>;
   if (!pet) return <div className="error">Nenhum pet encontrado.</div>;
+
+  // Verifica se o usuário logado é o dono do pet
+  const isOwner = userId && pet && userId === pet.fk_user;
 
   return (
     <div className="pet-detail-page">
@@ -134,17 +144,21 @@ const PetDetail = ({
             <img src={leftArrow} alt="Voltar" />
             Voltar
           </button>
-          <div className="admin-actions">
-            <button
-              className="btn-edit-admin"
-              onClick={() => onEditClick(petId)}
-            >
-              Editar
-            </button>
-            <button className="btn-delete-admin" onClick={handleDeleteClick}>
-              Excluir
-            </button>
-          </div>
+
+          {/* Só exibe ações administrativas (Editar/Excluir) se for o dono do pet */}
+          {isOwner && (
+            <div className="admin-actions">
+              <button
+                className="btn-edit-admin"
+                onClick={() => onEditClick(petId)}
+              >
+                Editar
+              </button>
+              <button className="btn-delete-admin" onClick={handleDeleteClick}>
+                Excluir
+              </button>
+            </div>
+          )}
         </div>
         <div className="pet-detail-container">
           {/* Coluna Esquerda: Ações, Carrossel e Nome */}

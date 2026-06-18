@@ -81,51 +81,63 @@ app.post('/pets', upload.fields([
   });
 });
 
-// --- ROTA: ATUALIZAR PET ---
-app.put('/pets/:id', upload.fields([
+// --- ROTA: ATUALIZAR PET (Protegida) ---
+app.put('/pets/:id', verifyToken, upload.fields([
   { name: 'profile_photo', maxCount: 1 },
   { name: 'others_photos_videos', maxCount: 6 }
 ]), (req, res) => {
   const { id } = req.params;
+  const userId = req.user.id;
   const {
     name, species, age, size, city,
     state, gender, vaccine, castrated,
     description, personality, contact
   } = req.body;
 
-  let sql = `
-    UPDATE pet SET 
-      name=?, species=?, age=?, size=?, city=?, 
-      state=?, gender=?, vaccine=?, castrated=?, 
-      description=?, personality=?, contact=?
-  `;
-  const values = [
-    name, species, age, size, city, 
-    state, gender, vaccine, castrated, 
-    description, personality, contact
-  ];
-
-  if (req.files && req.files['profile_photo']) {
-    sql += `, profile_photo=?`;
-    values.push(req.files['profile_photo'][0].filename);
-  }
-
-  if (req.files && req.files['others_photos_videos']) {
-    const others = req.files['others_photos_videos'];
-    const others_photos_videos = others.map(f => f.filename).join(',');
-    sql += `, others_photos_videos=?`;
-    values.push(others_photos_videos);
-  }
-
-  sql += ` WHERE id_pet=?`;
-  values.push(id);
-
-  db.query(sql, values, (err, result) => {
-    if (err) {
-      console.error('Erro ao atualizar pet:', err);
-      return res.status(500).json({ message: 'Erro ao atualizar pet.' });
+  // Primeiro verificamos se o pet pertence ao usuário
+  const checkSql = "SELECT fk_user FROM pet WHERE id_pet = ?";
+  db.query(checkSql, [id], (err, results) => {
+    if (err) return res.status(500).json({ error: "Erro ao verificar proprietário." });
+    if (results.length === 0) return res.status(404).json({ error: "Pet não encontrado." });
+    
+    if (results[0].fk_user !== userId) {
+      return res.status(403).json({ error: "Você não tem permissão para editar este pet." });
     }
-    res.json({ message: 'Pet atualizado com sucesso!' });
+
+    let sql = `
+      UPDATE pet SET 
+        name=?, species=?, age=?, size=?, city=?, 
+        state=?, gender=?, vaccine=?, castrated=?, 
+        description=?, personality=?, contact=?
+    `;
+    const values = [
+      name, species, age, size, city, 
+      state, gender, vaccine, castrated, 
+      description, personality, contact
+    ];
+
+    if (req.files && req.files['profile_photo']) {
+      sql += `, profile_photo=?`;
+      values.push(req.files['profile_photo'][0].filename);
+    }
+
+    if (req.files && req.files['others_photos_videos']) {
+      const others = req.files['others_photos_videos'];
+      const others_photos_videos = others.map(f => f.filename).join(',');
+      sql += `, others_photos_videos=?`;
+      values.push(others_photos_videos);
+    }
+
+    sql += ` WHERE id_pet=?`;
+    values.push(id);
+
+    db.query(sql, values, (err, result) => {
+      if (err) {
+        console.error('Erro ao atualizar pet:', err);
+        return res.status(500).json({ message: 'Erro ao atualizar pet.' });
+      }
+      res.json({ message: 'Pet atualizado com sucesso!' });
+    });
   });
 });
 
@@ -168,26 +180,38 @@ app.get('/pets/:id', (req, res) => {
   });
 });
 
-// --- ROTA: EXCLUIR PET ---
-app.delete('/pets/:id', (req, res) => {
+// --- ROTA: EXCLUIR PET (Protegida) ---
+app.delete('/pets/:id', verifyToken, (req, res) => {
   const { id } = req.params;
+  const userId = req.user.id;
 
-  // Primeiro removemos dos favoritos para evitar erro de chave estrangeira
-  const sqlDeleteFavorites = "DELETE FROM minha_casinha WHERE fk_pet_id = ?";
-
-  db.query(sqlDeleteFavorites, [id], (err) => {
-    if (err) {
-      console.error('Erro ao excluir favoritos do pet:', err);
-      return res.status(500).json({ message: 'Erro ao excluir pet (favoritos).' });
+  // Primeiro verificamos se o pet pertence ao usuário
+  const checkSql = "SELECT fk_user FROM pet WHERE id_pet = ?";
+  db.query(checkSql, [id], (err, results) => {
+    if (err) return res.status(500).json({ error: "Erro ao verificar proprietário." });
+    if (results.length === 0) return res.status(404).json({ error: "Pet não encontrado." });
+    
+    if (results[0].fk_user !== userId) {
+      return res.status(403).json({ error: "Você não tem permissão para excluir este pet." });
     }
 
-    const sqlDeletePet = "DELETE FROM pet WHERE id_pet = ?";
-    db.query(sqlDeletePet, [id], (err, result) => {
+    // Primeiro removemos dos favoritos para evitar erro de chave estrangeira
+    const sqlDeleteFavorites = "DELETE FROM minha_casinha WHERE fk_pet_id = ?";
+
+    db.query(sqlDeleteFavorites, [id], (err) => {
       if (err) {
-        console.error('Erro ao excluir pet:', err);
-        return res.status(500).json({ message: 'Erro ao excluir pet.' });
+        console.error('Erro ao excluir favoritos do pet:', err);
+        return res.status(500).json({ message: 'Erro ao excluir pet (favoritos).' });
       }
-      res.json({ message: 'Pet excluído com sucesso!' });
+
+      const sqlDeletePet = "DELETE FROM pet WHERE id_pet = ?";
+      db.query(sqlDeletePet, [id], (err, result) => {
+        if (err) {
+          console.error('Erro ao excluir pet:', err);
+          return res.status(500).json({ message: 'Erro ao excluir pet.' });
+        }
+        res.json({ message: 'Pet excluído com sucesso!' });
+      });
     });
   });
 });
