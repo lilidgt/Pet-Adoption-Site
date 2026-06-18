@@ -2,8 +2,11 @@ import React from "react";
 import "./Header.css";
 import logoText from "../../assets/logo_text.svg";
 import loginButton from "../../assets/login_button.svg";
+import logOut from "../../assets/LogoutButton.svg";
 
 const Header = ({
+  isLoggedIn,      // 🌟 RECEBE SE ESTÁ LOGADO
+  onLogoutClick,   // 🌟 RECEBE A FUNÇÃO DE LOGOUT
   onNavigate,
   onFavoritesClick,
   onLoginClick,
@@ -47,12 +50,21 @@ const Header = ({
         </a>
       </nav>
 
-      <img
-        src={loginButton}
-        alt="Login"
-        className="login-button"
-        onClick={onLoginClick}
-      />
+      {isLoggedIn ? (
+        <img
+          src={logOut}
+          alt="Sair"
+          className="logout-button"
+          onClick={onLogoutClick}
+        />
+      ) : (
+        <img
+          src={loginButton}
+          alt="Login"
+          className="login-button"
+          onClick={onLoginClick}
+        />
+      )}
     </header>
   );
 };

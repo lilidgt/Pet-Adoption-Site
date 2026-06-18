@@ -10,13 +10,30 @@ import "./App.css";
 
 function App() {
   const [currentPage, setCurrentPage] = useState("login");
-  // 1. Criamos um estado para guardar o ID do pet selecionado
   const [selectedPetId, setSelectedPetId] = useState(null);
 
-  // 2. Ajustamos a função para receber o ID do pet que foi clicado
+  // 1. [MUDANÇA] Adicionado o estado para controlar se está logado
+  const [isLoggedIn, setIsLoggedIn] = useState(() => {
+    return localStorage.getItem('user') !== null;
+  });
+
+  // 2. [MUDANÇA] Função para quando o login der certo
+  const handleLoginSuccess = () => {
+    setIsLoggedIn(true);
+    setCurrentPage("list");
+  };
+
+  // 3. [MUDANÇA] Função para limpar os dados ao sair
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
+    setIsLoggedIn(false);
+    setCurrentPage("login");
+  };
+
   const goToDetails = (id) => {
-    setSelectedPetId(id); // Agora ele salva dinamicamente o ID correto!
-    setCurrentPage("details"); // Muda para a tela de detalhes
+    setSelectedPetId(id);
+    setCurrentPage("details");
   };
 
   const goToEdit = (id) => {
@@ -38,7 +55,7 @@ function App() {
 
   const goToFavorites = () => {
     setCurrentPage("favorites");
-    };
+  };
 
   const goToRegisterPet = () => {
     setCurrentPage("register");
@@ -46,30 +63,37 @@ function App() {
 
   return (
     <div className="App">
+      {/* 4. [MUDANÇA] Trocado goToList por handleLoginSuccess */}
       {currentPage === "login" && (
-        <Login onLogin={goToList} onSignUpClick={goToSignUp} />
+        <Login onLogin={handleLoginSuccess} onSignUpClick={goToSignUp} />
       )}
       {currentPage === "signup" && (
         <SignUp onSignUp={goToList} onLoginClick={goToLogin} />
       )}
       {currentPage === "list" && (
         <PetsParaAdocao
-          onCardClick={goToDetails} // Agora essa função captura o ID enviado pelo card
+          onCardClick={goToDetails}
           onNavigate={goToList}
           onLoginClick={goToLogin}
           onFavoritesClick={goToFavorites}
           onRegisterPetClick={goToRegisterPet}
+          // 5. [MUDANÇA] Repassando as props de login para a página
+          isLoggedIn={isLoggedIn}
+          onLogoutClick={handleLogout}
         />
       )}
       {currentPage === "details" && (
         <PetDetail
-          petId={selectedPetId} // 3. PASSAMOS O ID SALVO PARA O COMPONENTE DETALHES!
+          petId={selectedPetId}
           onBackClick={goToList}
           onNavigate={goToList}
           onLoginClick={goToLogin}
           onFavoritesClick={goToFavorites}
           onRegisterPetClick={goToRegisterPet}
           onEditClick={goToEdit}
+          // 5. [MUDANÇA] Repassando as props de login para a página
+          isLoggedIn={isLoggedIn}
+          onLogoutClick={handleLogout}
         />
       )}
       {currentPage === "favorites" && (
@@ -79,6 +103,9 @@ function App() {
           onFavoritesClick={goToFavorites}
           onLoginClick={goToLogin}
           onRegisterPetClick={goToRegisterPet}
+          // 5. [MUDANÇA] Repassando as props de login para a página
+          isLoggedIn={isLoggedIn}
+          onLogoutClick={handleLogout}
         />
       )}
       {currentPage === "register" && (
@@ -87,15 +114,21 @@ function App() {
           onFavoritesClick={goToFavorites}
           onLoginClick={goToLogin}
           onRegisterPetClick={goToRegisterPet}
+          // 5. [MUDANÇA] Repassando as props de login para a página
+          isLoggedIn={isLoggedIn}
+          onLogoutClick={handleLogout}
         />
       )}
       {currentPage === "edit" && (
         <EditPet
           petId={selectedPetId}
-          onNavigate={goToDetails} // Após editar, volta para os detalhes do pet
+          onNavigate={goToDetails}
           onFavoritesClick={goToFavorites}
           onLoginClick={goToLogin}
           onRegisterPetClick={goToRegisterPet}
+          // 5. [MUDANÇA] Repassando as props de login para a página
+          isLoggedIn={isLoggedIn}
+          onLogoutClick={handleLogout}
         />
       )}
     </div>
