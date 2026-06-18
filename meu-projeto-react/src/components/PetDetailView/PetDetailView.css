@@ -132,12 +132,19 @@
 /* estilo do nome do pet */
 .pet-name {
     font-family: 'Gluten', cursive;
-    font-size: 3.0rem;
+    font-size: clamp(2rem, 4.5vw, 3rem);
     color: #4A2C2A;
     text-align: center;
     margin-top: 62px;
     font-weight: 900;
     letter-spacing: 2px;
+    display: inline-block;
+    width: 100%;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    white-space: normal;
+    line-height: 1.05;
 }
 
 /* coluna direita contendo cards de informacao */
@@ -357,7 +364,7 @@
 
     /* reduz tamanho do nome do pet */
     .pet-name {
-        font-size: 2.8rem;
+        font-size: clamp(2rem, 5vw, 2.8rem);
     }
 
     /* ajusta grade de atributos para 2 colunas */
@@ -399,7 +406,7 @@
 
     /* reduz ainda mais o tamanho do nome */
     .pet-name {
-        font-size: 2.2rem;
+        font-size: clamp(1.6rem, 8vw, 2.2rem);
     }
 
     /* altera botoes de acao para layout vertical */
