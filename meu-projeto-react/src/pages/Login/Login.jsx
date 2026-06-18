@@ -21,12 +21,14 @@ const Login = ({ onLogin, onSignUpClick }) => {
       const data = await response.json();
 
       if (response.ok) {
-        // Armazena os dados básicos do usuário e o token no localStorage
         localStorage.setItem('user', JSON.stringify(data.user));
         if (data.token) localStorage.setItem('token', data.token);
+        
+        // Salva o momento exato do login em milissegundos
+        localStorage.setItem('loginTimestamp', Date.now().toString());
 
         alert(`Bem-vindo de volta, ${data.user.username}!`);
-        onLogin(); // Chama a função que muda para a tela principal
+        onLogin(); 
       } else {
         alert(data.error || "E-mail ou senha incorretos.");
       }

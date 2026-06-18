@@ -13,6 +13,23 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// --- MIDDLEWARE DE AUTENTICAÇÃO JWT (Movido para cima para evitar o erro de inicialização) ---
+const verifyToken = (req, res, next) => {
+    const authHeader = req.headers['authorization'];
+    if (!authHeader) return res.status(401).json({ error: "Acesso negado. Token não fornecido." });
+
+    const token = authHeader.split(' ')[1];
+    if (!token) return res.status(401).json({ error: "Acesso negado. Token mal formatado." });
+
+    try {
+        const verified = jwt.verify(token, process.env.JWT_SECRET || 'fallback_secret_key_123');
+        req.user = verified; 
+        next(); 
+    } catch (err) {
+        res.status(403).json({ error: "Token inválido ou expirado." });
+    }
+};
+
 const db = mysql.createPool({
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
@@ -136,7 +153,7 @@ app.put('/pets/:id', verifyToken, upload.fields([
         console.error('Erro ao atualizar pet:', err);
         return res.status(500).json({ message: 'Erro ao atualizar pet.' });
       }
-      res.json({ message: 'Pet atualizado com sucesso!' });
+      res.json({ message: 'Pet updated successfully!' });
     });
   });
 });
@@ -286,23 +303,6 @@ app.post('/login', (req, res) => {
     });
 });
 
-// --- MIDDLEWARE DE AUTENTICAÇÃO JWT ---
-const verifyToken = (req, res, next) => {
-    const authHeader = req.headers['authorization'];
-    if (!authHeader) return res.status(401).json({ error: "Acesso negado. Token não fornecido." });
-
-    const token = authHeader.split(' ')[1];
-    if (!token) return res.status(401).json({ error: "Acesso negado. Token mal formatado." });
-
-    try {
-        const verified = jwt.verify(token, process.env.JWT_SECRET || 'fallback_secret_key_123');
-        req.user = verified; 
-        next(); 
-    } catch (err) {
-        res.status(403).json({ error: "Token inválido ou expirado." });
-    }
-};
-
 // --- ROTA PARA ADICIONAR OU REMOVER DOS FAVORITOS (Protegida) ---
 app.post('/favoritos/toggle', verifyToken, (req, res) => {
     const { id_user, id_pet } = req.body;
@@ -368,6 +368,7 @@ app.get('/favoritos/:id_user', verifyToken, (req, res) => {
     });
 });
 
+// --- INICIALIZAÇÃO DO SERVIDOR ---
 const BACKEND_PORT = 3001;
 app.listen(BACKEND_PORT, () => {
     console.log(`Servidor backend rodando na porta ${BACKEND_PORT}`);
