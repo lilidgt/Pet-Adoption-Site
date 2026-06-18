@@ -155,6 +155,36 @@
   background-color: #f0f0f0;
   transform: translateY(-2px);
 }
+.clear-filters-button {
+  background-color: #3b2323; /* Tom marrom escuro baseado na sua imagem */
+  color: #ffffff;
+  border: none;
+  padding: 14px 24px;
+  border-radius: 40px; /* Bordas bem arredondadas no estilo "pílula" como o print */
+  font-family: 'SN Pro', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  width: 100%; /* Ocupa a largura total do container de filtros */
+  box-sizing: border-box;
+  margin-top: 10px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+/* Efeito de Hover (passar o mouse) */
+.clear-filters-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+  background-color: #2b1919; /* Fica levemente mais escuro ao passar o mouse */
+}
+
+/* Efeito de Active (clique) */
+.clear-filters-button:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
 
 @media (max-width: 768px) {
   .filters-container {
