@@ -196,7 +196,6 @@ const Filters = ({ onFilterChange }) => {
         </div>
       </div>
 
-      {/* 2. [NOVO] Botão de limpar filtros */}
       <button 
         type="button" 
         className="clear-filters-button" 

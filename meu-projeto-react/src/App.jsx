@@ -9,7 +9,6 @@ import EditPet from "./pages/EditPet/EditPet";
 import "./App.css";
 
 function App() {
-  // Mudado para sessionStorage: fechou a aba, perde o acesso
   const [currentPage, setCurrentPage] = useState(() => {
     const token = sessionStorage.getItem("token");
     return token ? "list" : "login";
@@ -17,7 +16,6 @@ function App() {
 
   const [selectedPetId, setSelectedPetId] = useState(null);
 
-  // Tá logado apenas se existir o 'user' na sessão atual
   const [isLoggedIn, setIsLoggedIn] = useState(() => {
     return sessionStorage.getItem('user') !== null;
   });

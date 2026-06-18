@@ -11,8 +11,8 @@ const PetsParaAdocao = ({
   onFavoritesClick,
   onRegisterPetClick,
   onLoginClick,
-  isLoggedIn,     // 🌟 ALTERAÇÃO 1: Recebe o estado do App.jsx
-  onLogoutClick,  // 🌟 ALTERAÇÃO 2: Recebe a função do App.jsx
+  isLoggedIn,
+  onLogoutClick,
 }) => {
   const [pets, setPets] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -41,7 +41,6 @@ const PetsParaAdocao = ({
       });
   }, []);
 
-  // --- FUNÇÃO QUE FILTRA OS PETS EM TEMPO REAL ---
   const filteredPets = pets.filter((petItem) => {
     if (activeFilters.state && petItem.state) {
       const filterState = activeFilters.state.toLowerCase().trim();
@@ -85,7 +84,6 @@ const PetsParaAdocao = ({
 
   return (
     <div className="pets-adocao-container">
-      {/* 🌟 ALTERAÇÃO 3: Repassa os dados de login recebidos para o Header */}
       <Header
         onNavigate={onNavigate}
         onFavoritesClick={onFavoritesClick}
